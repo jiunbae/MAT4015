@@ -35,7 +35,7 @@ public:
 
 protected:
 	TrackerParam param;
-	MatND m_model3d;
-	Mat m_model, m_backproj;
+	MatND model3d;
+	Mat model, backproj, maskproj;
 	Rect rect;
 };

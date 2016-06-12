@@ -120,9 +120,9 @@ void process(VideoCapture * vc, COLOR_MODEL model)
 		{
 			*vc >> frame;
 			if (frame.empty())
-				break;
-			Rect rect;
-			tracker.run(frame, rect);
+				break;;
+			Rect nRect;
+			tracker.run(frame, nRect);
 		}
 
 		if (param.updated)

@@ -15,13 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cc">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="cv_tracker.cc">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="tracker.cc">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cc">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

@@ -152,8 +152,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cc" />
     <ClCompile Include="cv_tracker.cc" />
+    <ClCompile Include="main.cc" />
     <ClCompile Include="tracker.cc" />
   </ItemGroup>
   <ItemGroup>
