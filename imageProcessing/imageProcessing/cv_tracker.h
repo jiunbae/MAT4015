@@ -23,10 +23,10 @@ struct TrackerParam
 	}
 };
 
-class Tracker {
+class cvTracker {
 public:
-	Tracker(void);
-	~Tracker(void);
+	cvTracker(void);
+	~cvTracker(void);
 
 	void initilize(Mat, Rect, COLOR_MODEL);
 	bool run(Mat, Rect&);

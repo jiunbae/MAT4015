@@ -1,12 +1,12 @@
 #include <iostream>
 #include <Windows.h>
-#include "tracker.h"
+#include "cv_tracker.h"
 
 using namespace std;
 
-static string WINDOW_NAME = "TEST";
+static string NAME = "MAT4015";
 
-void process(VideoCapture *);
+void process(VideoCapture *, COLOR_MODEL);
 string get_filename();
 void onMouse(int, int, int, int, void*);
 
@@ -15,32 +15,42 @@ struct MouseParam
 	Mat frame;
 	Point pt1, pt2;
 	Rect rect;
-	bool drag;
-	bool updated;
+	bool drag, updated;
 };
 
 int main(int argc, char * argv[])
 {
+	// print information
 	cout << "MAT4015 - project image tracking" << endl;
 	cout << "Developed by MaybeS(https://github.com/MaybeS), 2016" << endl;
-	cout << "\tOpenCV Version: " << CV_VERSION << endl;
+	cout << "\tOpenCV Version: " << CV_VERSION << endl << endl;
 	
+	// get filename
+	cout << "Select file for image tracking" << endl;
 	string name = get_filename();
 	if (name == "")
 	{
-		cout << "select file" << endl;
+		cout << "\t@select file for image tarcking!" << endl;
 		return 0;
 	}
+	cout << "\t" << name << " selected" << endl << endl;
 
+	// new VideoCapture
 	VideoCapture * vc = new VideoCapture(name);
 	if (!vc->isOpened())
 	{
-		cout << "can't open file" << endl;
+		cout << "\t@select openable video file!" << endl;
 		return 0;
 	}
 
+	// set Color Model
+	cout << "Select color model" << endl;
+	int model;
+	cout << "\t1. HSV" << endl << "\t2. RGB" << endl << "\t3. hue" << endl << "\t4. gray" << endl << "selected model: ";
+	cin >> model;
+
 	if (vc)
-		process(vc);
+		process(vc, static_cast<COLOR_MODEL>(model - 1));
 	//if (vc)
 	//	delete vc;
 
@@ -59,6 +69,7 @@ void onMouse(int event, int x, int y, int flags, void* param)
 			p->pt2 = p->pt1;
 			p->drag = true;
 			break;
+
 		case CV_EVENT_LBUTTONUP:
 			{
 				int w = x - p->pt1.x;
@@ -74,6 +85,7 @@ void onMouse(int event, int x, int y, int flags, void* param)
 					p->updated = true;
 				break;
 			}
+
 		case CV_EVENT_MOUSEMOVE:
 			if (p->drag && (p->pt2.x != x || p->pt2.y != y) && !p->updated)
 			{
@@ -82,15 +94,14 @@ void onMouse(int event, int x, int y, int flags, void* param)
 				p->pt2.y = y;
 				rectangle(img, p->pt1, p->pt2, Scalar(0, 255, 0), 1);
 				imshow("image", img);
+				break;
 			}
-			break;
 	}
 }
 
-void process(VideoCapture * vc)
+void process(VideoCapture * vc, COLOR_MODEL model)
 {
-	tracker_opencv tracker;
-	tracker.configure();
+	cvTracker tracker;
 
 	Mat frame;
 	*vc >> frame;
@@ -105,21 +116,20 @@ void process(VideoCapture * vc)
 	bool tracking = false;
 	while (1)
 	{
-		if (param.updated)
-		{
-			Rect rc = param.rect;
-			tracker.init(frame, rc);
-			param.updated = false;
-			tracking = true;
-		}
-
 		if (tracking)
 		{
 			*vc >> frame;
 			if (frame.empty())
 				break;
-			Rect rc;
-			bool ok = tracker.run(frame, rc);
+			Rect rect;
+			tracker.run(frame, rect);
+		}
+
+		if (param.updated)
+		{
+			tracker.initilize(frame, param.rect, model);
+			param.updated = false;
+			tracking = true;
 		}
 
 		imshow("image", frame);
@@ -131,7 +141,6 @@ void process(VideoCapture * vc)
 
 string get_filename()
 {
-	cout << "select file for image tracking" << endl;
 	OPENFILENAME file;
 	char szFile[MAX_PATH] = "";
 	ZeroMemory(&file, sizeof(OPENFILENAME));
@@ -147,6 +156,5 @@ string get_filename()
 	file.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 	if (::GetOpenFileName(&file) == false)
 		return "";
-	cout << szFile << "selected" << endl;
 	return szFile;
 }
