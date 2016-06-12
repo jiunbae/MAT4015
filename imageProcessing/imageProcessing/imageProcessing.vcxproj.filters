@@ -18,5 +18,13 @@
     <ClCompile Include="main.cc">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="tracker.cc">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="tracker.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
