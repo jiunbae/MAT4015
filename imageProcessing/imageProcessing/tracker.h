@@ -7,6 +7,9 @@
 
 using namespace cv;
 
+#ifndef TRACKER
+#define TRACKER
+
 enum COLOR_MODEL { CM_HSV, CM_RGB, CM_HUE, CM_GRAY };
 
 struct TrackerParam
@@ -31,11 +34,13 @@ public:
 	void initilize(Mat, Rect, COLOR_MODEL);
 	bool run(Mat, Rect&);
 
-	Mat get_bp_image();
+	Mat get_image();
 
 protected:
 	TrackerParam param;
-	MatND m_model3d;
-	Mat m_model, m_backproj;
+	MatND model3d;
+	Mat model, backproj;
 	Rect rect;
 };
+
+#endif

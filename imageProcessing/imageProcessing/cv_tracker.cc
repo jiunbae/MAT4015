@@ -3,25 +3,25 @@
 
 using namespace std;
 
-cvTracker::cvTracker(void) {}
-cvTracker::~cvTracker(void) {}
+Tracker::Tracker(void) {}
+Tracker::~Tracker(void) {}
 
-void cvTracker::initilize(Mat img, Rect rc, COLOR_MODEL cModel)
+void Tracker::initilize(Mat img, Rect rc, COLOR_MODEL cModel)
 {
 	Mat mask = Mat::zeros(rc.height, rc.width, CV_8U);
 	ellipse(mask, Point(rc.width / 2, rc.height / 2), Size(rc.width / 2, rc.height / 2), 0, 0, 360, 255, CV_FILLED);
-	param.color_model = cModel;
+	param.cModel = cModel;
 
 	if (img.channels() <= 1)
 	{
-		float vrange[] = { 0,256 };
+		float vrange[] = { 0, 256 };
 		const float* phranges = vrange;
 		Mat roi(img, rc);
 		calcHist(&roi, 1, 0, mask, model, 1, &param.hist_bins, &phranges);
 	}
 	else
 	{
-		switch (param.color_model)
+		switch (param.cModel)
 		{
 			case CM_GRAY:
 				{
@@ -32,8 +32,8 @@ void cvTracker::initilize(Mat img, Rect rc, COLOR_MODEL cModel)
 					const float* phranges = vrange;
 					Mat target(gray, rc);
 					calcHist(&target, 1, 0, mask, model, 1, &param.hist_bins, &phranges);
-					imshow("histogram", gray);
-					imshow("histogram_target", target);
+					imshow(APPLIED_NAME, gray);
+					imshow(APPLIED_TARGET_NAME, target);
 					break;
 				}
 			case CM_HUE:
@@ -46,8 +46,8 @@ void cvTracker::initilize(Mat img, Rect rc, COLOR_MODEL cModel)
 					int channels[] = { 0 };
 					Mat target(hsv, rc);
 					calcHist(&target, 1, channels, mask, model, 1, &param.hist_bins, &phranges);
-					imshow("histogram", hsv);
-					imshow("histogram_target", target);
+					imshow(APPLIED_NAME, hsv);
+					imshow(APPLIED_TARGET_NAME, target);
 					break;
 				}
 			case CM_RGB:
@@ -58,8 +58,8 @@ void cvTracker::initilize(Mat img, Rect rc, COLOR_MODEL cModel)
 					int hist_sizes[] = { param.hist_bins, param.hist_bins, param.hist_bins };
 					Mat target(img, rc);
 					calcHist(&target, 1, channels, mask, model3d, 3, hist_sizes, ranges);
-					imshow("histogram", img);
-					imshow("histogram_target", target);
+					imshow(APPLIED_NAME, img);
+					imshow(APPLIED_TARGET_NAME, target);
 					break;
 				}
 			case CM_HSV:
@@ -74,8 +74,8 @@ void cvTracker::initilize(Mat img, Rect rc, COLOR_MODEL cModel)
 					int hist_sizes[] = { param.hist_bins, param.hist_bins, param.hist_bins };
 					Mat target(hsv, rc);
 					calcHist(&target, 1, channels, mask, model3d, 3, hist_sizes, ranges);
-					imshow("histogram", hsv);
-					imshow("histogram_target", target);
+					imshow(APPLIED_NAME, hsv);
+					imshow(APPLIED_TARGET_NAME, target);
 					break;
 				}
 		}
@@ -85,7 +85,7 @@ void cvTracker::initilize(Mat img, Rect rc, COLOR_MODEL cModel)
 	rect = rc;
 }
 
-bool cvTracker::run(Mat img, Rect& rc)
+bool Tracker::run(Mat img)
 {
 	// histogram backprojection
 	if (img.channels() <= 1)
@@ -96,7 +96,7 @@ bool cvTracker::run(Mat img, Rect& rc)
 	}
 	else
 	{
-		switch (param.color_model)
+		switch (param.cModel)
 		{
 		case CM_GRAY:
 			{
@@ -143,29 +143,34 @@ bool cvTracker::run(Mat img, Rect& rc)
 		}
 	}
 
-	// tracking - mean shift
-	int itrs = meanShift(backproj, rect, TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, param.max_itrs, 1));
-	rectangle(img, rect, Scalar(0, 255, 0), 3, CV_AA);
-
-	// tracking - cam shift
-	/*if (rect.width>0 && rect.height>0)
+	//mean shift
+	if (1)
 	{
-		RotatedRect trackBox = CamShift(m_backproj, rect, TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, param.max_itrs, 1));
-		ellipse(img, trackBox, Scalar(0, 0, 255), 3, CV_AA);
+		int itrs = meanShift(backproj, rect, TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, param.max_itrs, 1));
+		rectangle(img, rect, Scalar(0, 255, 0), 3, CV_AA);
+	}
+	//cam shift
+	else
+	{
+		if (rect.width > 0 && rect.height > 0)
+		{
+			RotatedRect trackBox = CamShift(backproj, rect, TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, param.max_itrs, 1));
+			ellipse(img, trackBox, Scalar(0, 0, 255), 3, CV_AA);
+		}
+
+		if (rect.width <= 1 || rect.height <= 1)
+		{
+			int cols = backproj.cols, rows = backproj.rows, r = (MIN(cols, rows) + 5) / 6;
+			rect = Rect(rect.x - r, rect.y - r, rect.width + 2 * r, rect.height + 2 * r) & Rect(0, 0, cols, rows);
+		}
 	}
 
-	if (rect.width <= 1 || rect.height <= 1)
-	{
-		int cols = m_backproj.cols, rows = m_backproj.rows, r = (MIN(cols, rows) + 5) / 6;
-		rect = Rect(rect.x - r, rect.y - r, rect.width + 2 * r, rect.height + 2 * r) & Rect(0, 0, cols, rows);
-	}*/
-
-	rc = rect;
 	return true;
 }
 
-Mat cvTracker::get_bp_image()
+Mat Tracker::get_image()
 {
-	normalize(backproj, backproj, 0, 255, CV_MINMAX);
-	return backproj;
+	Mat ret;
+	normalize(backproj, ret, 0, 255, CV_MINMAX);
+	return ret;
 }

@@ -153,12 +153,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cv_tracker.cc" />
+    <ClCompile Include="cv_window.cc" />
     <ClCompile Include="main.cc" />
-    <ClCompile Include="tracker.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cv_tracker.h" />
-    <ClInclude Include="tracker.h" />
+    <ClInclude Include="cv_window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

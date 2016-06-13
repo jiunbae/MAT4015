@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef __CV__TRACKER__
+#define __CV__TRACKER__
+
 #include "opencv2\core\core.hpp"
 #include "opencv2\highgui\highgui.hpp"
 #include "opencv2\imgproc\imgproc.hpp"
@@ -7,35 +10,41 @@
 
 using namespace cv;
 
-enum COLOR_MODEL { CM_HSV, CM_RGB, CM_HUE, CM_GRAY };
+#define APPLIED_NAME "applied"
+#define APPLIED_TARGET_NAME "applied target"
 
-struct TrackerParam
-{
-	int hist_bins;
-	int max_itrs;
-	COLOR_MODEL color_model;
+namespace cv {
+	enum COLOR_MODEL { CM_HSV, CM_RGB, CM_HUE, CM_GRAY };
 
-	TrackerParam()
+	struct TrackerParam
 	{
-		hist_bins = 16;
-		max_itrs = 16;
-		color_model = CM_HSV;
-	}
-};
+		int hist_bins;
+		int max_itrs;
+		COLOR_MODEL cModel;
 
-class cvTracker {
-public:
-	cvTracker(void);
-	~cvTracker(void);
+		TrackerParam()
+		{
+			hist_bins = 32;
+			max_itrs = 32;
+			cModel = CM_HSV;
+		}
+	};
 
-	void initilize(Mat, Rect, COLOR_MODEL);
-	bool run(Mat, Rect&);
+	class Tracker {
+	public:
+		Tracker();
+		~Tracker();
 
-	Mat get_bp_image();
+		void initilize(Mat, Rect, COLOR_MODEL);
+		bool run(Mat);
 
-protected:
-	TrackerParam param;
-	MatND model3d;
-	Mat model, backproj, maskproj;
-	Rect rect;
-};
+		Mat get_image();
+
+	protected:
+		TrackerParam param;
+		MatND model3d;
+		Mat model, backproj, maskproj;
+		Rect rect;
+	};
+}
+#endif

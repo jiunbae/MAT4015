@@ -1,23 +1,49 @@
 #include <iostream>
 #include <Windows.h>
 #include "cv_tracker.h"
+#include "cv_window.h"
 
 using namespace std;
 
-static string NAME = "MAT4015";
+#define PROGRAM_NAME "MAT4015"
+#define WINDOW_NAME "tracking"
 
-void process(VideoCapture *, COLOR_MODEL);
 string get_filename();
 void onMouse(int, int, int, int, void*);
+void process(VideoCapture *, COLOR_MODEL);
 
-struct MouseParam
+
+void eventMouse(int event, int x, int y, int flags, void * param)
 {
-	Mat frame;
-	Point pt1, pt2;
-	Rect rect;
-	bool drag, updated;
-};
+	MouseParam* p = (MouseParam*)param;
+	switch (event)
+	{
+		case CV_EVENT_LBUTTONDOWN:
+			p->ePoint = p->sPoint = { x, y };
+			p->drag = true;
+			break;
 
+		case CV_EVENT_LBUTTONUP:
+		{
+			p->rect = { p->sPoint.x, p->sPoint.y, x - p->sPoint.x, y - p->sPoint.y };
+			p->drag = false;
+
+			if (p->rect.area() > 100)
+				p->updated = true;
+			break;
+		}
+
+		case CV_EVENT_MOUSEMOVE:
+			if (p->drag && (p->ePoint.x - x || p->ePoint.y - y) && !p->updated)
+			{
+				Mat img = p->frame.clone();
+				p->ePoint = { x, y };
+				rectangle(img, p->sPoint, p->ePoint, Scalar(0, 0, 255), 2);
+				imshow(WINDOW_NAME, img);
+				break;
+			}
+	}
+}
 int main(int argc, char * argv[])
 {
 	// print information
@@ -48,6 +74,12 @@ int main(int argc, char * argv[])
 	int model;
 	cout << "\t1. HSV" << endl << "\t2. RGB" << endl << "\t3. hue" << endl << "\t4. gray" << endl << "selected model: ";
 	cin >> model;
+	/*
+	Window * window = new Window(name);
+	window->setMouseCallback(eventMouse);
+	Mat img;
+	*vc >> img;
+	window->setImage(img);*/
 
 	if (vc)
 		process(vc, static_cast<COLOR_MODEL>(model - 1));
@@ -64,36 +96,27 @@ void onMouse(int event, int x, int y, int flags, void* param)
 	switch (event)
 	{
 		case CV_EVENT_LBUTTONDOWN:
-			p->pt1.x = x;
-			p->pt1.y = y;
-			p->pt2 = p->pt1;
+			p->ePoint = p->sPoint = { x, y };
 			p->drag = true;
 			break;
 
 		case CV_EVENT_LBUTTONUP:
 			{
-				int w = x - p->pt1.x;
-				int h = y - p->pt1.y;
-
-				p->rect.x = p->pt1.x;
-				p->rect.y = p->pt1.y;
-				p->rect.width = w;
-				p->rect.height = h;
+				p->rect = { p->sPoint.x, p->sPoint.y, x - p->sPoint.x, y - p->sPoint.y };
 				p->drag = false;
-
-				if (w >= 10 && h >= 10)
+				
+				if (p->rect.area() > 100)
 					p->updated = true;
 				break;
 			}
 
 		case CV_EVENT_MOUSEMOVE:
-			if (p->drag && (p->pt2.x != x || p->pt2.y != y) && !p->updated)
+			if (p->drag && (p->ePoint.x - x || p->ePoint.y - y) && !p->updated)
 			{
 				Mat img = p->frame.clone();
-				p->pt2.x = x;
-				p->pt2.y = y;
-				rectangle(img, p->pt1, p->pt2, Scalar(0, 255, 0), 1);
-				imshow("image", img);
+				p->ePoint = { x, y };
+				rectangle(img, p->sPoint, p->ePoint, Scalar(0, 0, 255), 2);
+				imshow(WINDOW_NAME, img);
 				break;
 			}
 	}
@@ -101,17 +124,17 @@ void onMouse(int event, int x, int y, int flags, void* param)
 
 void process(VideoCapture * vc, COLOR_MODEL model)
 {
-	cvTracker tracker;
+	Tracker tracker;
 
 	Mat frame;
 	*vc >> frame;
-	imshow("image", frame);
+	imshow(WINDOW_NAME, frame);
 
 	MouseParam param;
 	param.frame = frame;
 	param.drag = false;
 	param.updated = false;
-	setMouseCallback("image", onMouse, &param);
+	setMouseCallback(WINDOW_NAME, onMouse, &param);
 
 	bool tracking = false;
 	while (1)
@@ -120,9 +143,9 @@ void process(VideoCapture * vc, COLOR_MODEL model)
 		{
 			*vc >> frame;
 			if (frame.empty())
-				break;;
-			Rect nRect;
-			tracker.run(frame, nRect);
+				break;
+
+			tracker.run(frame);
 		}
 
 		if (param.updated)
@@ -132,7 +155,7 @@ void process(VideoCapture * vc, COLOR_MODEL model)
 			tracking = true;
 		}
 
-		imshow("image", frame);
+		imshow(WINDOW_NAME, frame);
 
 		if (waitKey(10) == 27)
 			break;
