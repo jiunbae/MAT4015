@@ -14,8 +14,11 @@ using namespace cv;
 #define APPLIED_TARGET_NAME "applied target"
 
 namespace cv {
+
+	// color model enum
 	enum COLOR_MODEL { CM_HSV, CM_RGB, CM_HUE, CM_GRAY };
 
+	// tracker parameter
 	struct TrackerParam
 	{
 		int hist_bins;

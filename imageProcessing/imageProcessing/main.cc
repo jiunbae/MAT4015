@@ -1,7 +1,6 @@
 #include <iostream>
 #include <Windows.h>
 #include "cv_tracker.h"
-#include "cv_window.h"
 
 using namespace std;
 
@@ -12,38 +11,6 @@ string get_filename();
 void onMouse(int, int, int, int, void*);
 void process(VideoCapture *, COLOR_MODEL);
 
-
-void eventMouse(int event, int x, int y, int flags, void * param)
-{
-	MouseParam* p = (MouseParam*)param;
-	switch (event)
-	{
-		case CV_EVENT_LBUTTONDOWN:
-			p->ePoint = p->sPoint = { x, y };
-			p->drag = true;
-			break;
-
-		case CV_EVENT_LBUTTONUP:
-		{
-			p->rect = { p->sPoint.x, p->sPoint.y, x - p->sPoint.x, y - p->sPoint.y };
-			p->drag = false;
-
-			if (p->rect.area() > 100)
-				p->updated = true;
-			break;
-		}
-
-		case CV_EVENT_MOUSEMOVE:
-			if (p->drag && (p->ePoint.x - x || p->ePoint.y - y) && !p->updated)
-			{
-				Mat img = p->frame.clone();
-				p->ePoint = { x, y };
-				rectangle(img, p->sPoint, p->ePoint, Scalar(0, 0, 255), 2);
-				imshow(WINDOW_NAME, img);
-				break;
-			}
-	}
-}
 int main(int argc, char * argv[])
 {
 	// print information
@@ -51,7 +18,7 @@ int main(int argc, char * argv[])
 	cout << "Developed by MaybeS(https://github.com/MaybeS), 2016" << endl;
 	cout << "\tOpenCV Version: " << CV_VERSION << endl << endl;
 	
-	// get filename
+	// get filename (select file dialog)
 	cout << "Select file for image tracking" << endl;
 	string name = get_filename();
 	if (name == "")
@@ -69,18 +36,13 @@ int main(int argc, char * argv[])
 		return 0;
 	}
 
-	// set Color Model
+	// set Color Model (select color model)
 	cout << "Select color model" << endl;
 	int model;
 	cout << "\t1. HSV" << endl << "\t2. RGB" << endl << "\t3. hue" << endl << "\t4. gray" << endl << "selected model: ";
 	cin >> model;
-	/*
-	Window * window = new Window(name);
-	window->setMouseCallback(eventMouse);
-	Mat img;
-	*vc >> img;
-	window->setImage(img);*/
 
+	// process object tracking
 	if (vc)
 		process(vc, static_cast<COLOR_MODEL>(model - 1));
 	//if (vc)
@@ -90,6 +52,14 @@ int main(int argc, char * argv[])
 	destroyAllWindows();
 	return 0;
 }
+struct MouseParam {
+	Mat frame;
+	Point sPoint, ePoint;
+	Rect rect;
+	bool drag, updated;
+};
+// Mouse Event callback function
+// using for select tracking object
 void onMouse(int event, int x, int y, int flags, void* param)
 {
 	MouseParam * p = (MouseParam *)param;
@@ -122,6 +92,7 @@ void onMouse(int event, int x, int y, int flags, void* param)
 	}
 }
 
+// object tracking process with Tracker - cv_tracker
 void process(VideoCapture * vc, COLOR_MODEL model)
 {
 	Tracker tracker;
@@ -139,22 +110,29 @@ void process(VideoCapture * vc, COLOR_MODEL model)
 	bool tracking = false;
 	while (1)
 	{
+		// tracking
 		if (tracking)
 		{
+			// next frame
 			*vc >> frame;
 			if (frame.empty())
 				break;
 
-			tracker.run(frame);
+			// run traking
+			// for (int i = 0; i < 3; ++i)
+				tracker.run(frame);
 		}
 
+		// if tracking object selected
 		if (param.updated)
 		{
+			// initilize with param.rect(selected object)
 			tracker.initilize(frame, param.rect, model);
 			param.updated = false;
 			tracking = true;
 		}
 
+		// show frame to window
 		imshow(WINDOW_NAME, frame);
 
 		if (waitKey(10) == 27)
@@ -162,6 +140,7 @@ void process(VideoCapture * vc, COLOR_MODEL model)
 	}
 }
 
+// get filename dialog
 string get_filename()
 {
 	OPENFILENAME file;

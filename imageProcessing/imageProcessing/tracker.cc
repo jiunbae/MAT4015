@@ -9,6 +9,7 @@ void Tracker::initilize(Mat img, Rect rc, COLOR_MODEL cModel)
 	ellipse(mask, Point(rc.width / 2, rc.height / 2), Size(rc.width / 2, rc.height / 2), 0, 0, 360, 255, CV_FILLED);
 	param.color_model = cModel;
 
+
 	if (img.channels() <= 1)
 	{
 		float vrange[] = { 0,256 };

@@ -6,10 +6,11 @@ using namespace std;
 Tracker::Tracker(void) {}
 Tracker::~Tracker(void) {}
 
+// initilize (img = first frame, rc = select tracking object, cModel = color model)
 void Tracker::initilize(Mat img, Rect rc, COLOR_MODEL cModel)
 {
-	Mat mask = Mat::zeros(rc.height, rc.width, CV_8U);
-	ellipse(mask, Point(rc.width / 2, rc.height / 2), Size(rc.width / 2, rc.height / 2), 0, 0, 360, 255, CV_FILLED);
+	// this is mask for calc histogram
+	Mat mask = Mat();
 	param.cModel = cModel;
 
 	if (img.channels() <= 1)
@@ -19,6 +20,8 @@ void Tracker::initilize(Mat img, Rect rc, COLOR_MODEL cModel)
 		Mat roi(img, rc);
 		calcHist(&roi, 1, 0, mask, model, 1, &param.hist_bins, &phranges);
 	}
+	// switch with color model
+	// each switch run calcHist with colormodel
 	else
 	{
 		switch (param.cModel)
@@ -85,6 +88,7 @@ void Tracker::initilize(Mat img, Rect rc, COLOR_MODEL cModel)
 	rect = rc;
 }
 
+// object tracking
 bool Tracker::run(Mat img)
 {
 	// histogram backprojection
@@ -94,6 +98,7 @@ bool Tracker::run(Mat img)
 		const float* phranges = vrange;
 		calcBackProject(&img, 1, 0, model, backproj, &phranges);
 	}
+	// swith with color model, run backprojection
 	else
 	{
 		switch (param.cModel)
@@ -144,7 +149,7 @@ bool Tracker::run(Mat img)
 	}
 
 	//mean shift
-	if (1)
+	if (0)
 	{
 		int itrs = meanShift(backproj, rect, TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, param.max_itrs, 1));
 		rectangle(img, rect, Scalar(0, 255, 0), 3, CV_AA);
