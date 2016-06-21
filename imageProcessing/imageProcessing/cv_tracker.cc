@@ -9,6 +9,25 @@ Tracker::~Tracker(void) {}
 // initilize (img = first frame, rc = select tracking object, cModel = color model)
 void Tracker::initilize(Mat img, Rect rc, COLOR_MODEL cModel)
 {
+	if (my)
+	{
+		Mat roi(img, rc), hsv, histImg(param.hist_bins * HistRatio, param.hist_bins * HistRatio, CV_8U, Scalar(255));
+		cvtColor(img, hsv, CV_BGR2HSV);
+
+		// show screen of color histogram each channels
+		double * hists = myHistogram(hsv, rc);
+		for (int i = 0; i < param.hist_bins; ++i)
+		{
+			int intensity = static_cast<int>(hists[i] * param.hist_bins / 1), j = HistRatio;
+			while (j--)
+				line(histImg, Point(i * HistRatio + j, param.hist_bins * HistRatio),
+					Point(i * HistRatio + j, (param.hist_bins - intensity * HistRatio) * HistRatio), Scalar::all(0));
+		}
+		imshow("histogram", histImg);
+
+
+		return;
+	}
 	// this is mask for calc histogram
 	Mat mask = Mat();
 	param.cModel = cModel;
@@ -91,6 +110,11 @@ void Tracker::initilize(Mat img, Rect rc, COLOR_MODEL cModel)
 // object tracking
 bool Tracker::run(Mat img)
 {
+	if (my)
+	{
+
+		return true;
+	}
 	// histogram backprojection
 	if (img.channels() <= 1)
 	{
@@ -149,7 +173,7 @@ bool Tracker::run(Mat img)
 	}
 
 	//mean shift
-	if (0)
+	if (1)
 	{
 		int itrs = meanShift(backproj, rect, TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, param.max_itrs, 1));
 		rectangle(img, rect, Scalar(0, 255, 0), 3, CV_AA);
@@ -178,4 +202,51 @@ Mat Tracker::get_image()
 	Mat ret;
 	normalize(backproj, ret, 0, 255, CV_MINMAX);
 	return ret;
+}
+
+double cv::Tracker::mySimilarity(const Mat& img, CvPoint point, double * hists)
+{
+	double similarity = 0;
+
+	int left = max(point.x - rect.width / 2, 0), right = min(point.x + rect.width / 2, img.size().width);
+	int down = max(point.y - rect.width / 2, 0), up = min(point.y + rect.width / 2, img.size().height);
+	Rect rc(left, down, left + right, down + up);
+
+	double * nHists = myHistogram(img, rc);
+	for (int i = 0; i < param.hist_bins; ++i)
+		similarity += sqrt(hists[i] * nHists[i]);
+
+	return similarity;
+}
+
+double * Tracker::myHistogram(const Mat& img, const Rect& rc)
+{
+	double * hists = (double*)calloc(param.hist_bins, sizeof(double)), hist_size = 256 / param.hist_bins;
+
+	for (int i = rc.x; i < rc.x + rc.width; ++i)
+		for (int j = rc.y; j < rc.y + rc.height; ++j)
+			hists[myHistogramAt(img, i, j) / (int)hist_size]++;
+
+	int total = 0;
+	for (int i = 0; i < param.hist_bins; ++i)
+		total += hists[i] * hists[i];
+	total = sqrt(total);
+	for (int i = 0; i < param.hist_bins; ++i)
+		hists[i] /= total;
+
+	return hists;
+}
+
+int Tracker::myHistogramAt(const Mat& img, int x, int y)
+{
+	int sum = 0;
+	uchar * value = img.data + y * img.step + x * img.elemSize();
+	for (int k = 0; k < img.channels(); ++k)
+		sum += value[k] * this->param.channel_ratio[k];
+	return sum;
+}
+
+double Tracker::myHistogramValue(const Mat& img, int x, int y, double * hists)
+{
+	return hists[myHistogramAt(img, x, y) / param.hist_bins];
 }
