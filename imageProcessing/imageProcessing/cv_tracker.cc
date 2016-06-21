@@ -111,7 +111,7 @@ bool Tracker::run(Mat img)
 		Rect nRect = rect, temp;
 		double nX = 0, nY = 0, tW = 0, w;
 		do {
-			nX = 0; nY = 0; rect = nRect;
+			tW = 0, nX = 0; nY = 0; rect = nRect;
 
 			// set searching area
 			temp = Rect(max(nRect.x - param.search_range, 0), max(nRect.y - param.search_range, 0),
@@ -124,7 +124,7 @@ bool Tracker::run(Mat img)
 					tW += w;
 					nX += w * (temp.x + (temp.width / 2) + i);
 					nY += w * (temp.y + (temp.height / 2) + j);
-					if (i != 0 && j != 0)
+					if (i != 0 || j != 0)
 					{
 						w = mySimilarity(hsv, temp.x + (temp.width / 2) - i, temp.y + (temp.height / 2) - j, this->objectHists);
 						tW += w;
@@ -140,6 +140,7 @@ bool Tracker::run(Mat img)
 		rect = nRect;
 		//this->objectHists = myHistogram(img, rect = nRect);
 
+		// back projection
 		Mat imx = hsv.clone();
 		for (int i = 0; i < hsv.cols; ++i)
 		{
@@ -150,8 +151,8 @@ bool Tracker::run(Mat img)
 				matrixSet(imx, i, j, pixel);
 			}
 		}
+		imshow("backproj", imx);
 
-		imshow("applied", imx);
 		// show tracking object rectangle of (0,255,0)
 		rectangle(img, rect, Scalar(0, 255, 0), 3, CV_AA);
 
@@ -251,11 +252,8 @@ double cv::Tracker::mySimilarity(const Mat& img, int x, int y, double * hists)
 {
 	double similarity = 0;
 
-	int left = x - rect.width / 2, right = x + rect.width / 2;
-	int down = y - rect.width / 2, up = y + rect.width / 2;
-	Rect rc(max(left, 0), max(down, 0), min(left + right, img.size().width), min(down + up,img.size().height));
+	double * nHists = myHistogram(img, Rect(x - rect.width /2 , y - rect.height/2 , rect.width, rect.height));
 
-	double * nHists = myHistogram(img, rc);
 	for (int i = 0; i < param.hist_bins; ++i)
 		similarity += sqrt(hists[i] * nHists[i]);
 
