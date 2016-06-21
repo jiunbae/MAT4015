@@ -58,6 +58,7 @@ struct MouseParam {
 	Rect rect;
 	bool drag, updated;
 };
+
 // Mouse Event callback function
 // using for select tracking object
 void onMouse(int event, int x, int y, int flags, void* param)
@@ -99,6 +100,8 @@ void process(VideoCapture * vc, COLOR_MODEL model)
 
 	Mat frame;
 	*vc >> frame;
+
+	// open window for image capture
 	imshow(WINDOW_NAME, frame);
 
 	MouseParam param;
@@ -117,10 +120,8 @@ void process(VideoCapture * vc, COLOR_MODEL model)
 			*vc >> frame;
 			if (frame.empty())
 				break;
-
-			// run traking
-			// for (int i = 0; i < 3; ++i)
-				tracker.run(frame);
+			
+			tracker.run(frame);
 		}
 
 		// if tracking object selected
@@ -130,10 +131,10 @@ void process(VideoCapture * vc, COLOR_MODEL model)
 			tracker.initilize(frame, param.rect, model);
 			param.updated = false;
 			tracking = true;
-		}
 
-		// show frame to window
-		imshow(WINDOW_NAME, frame);
+			// close window
+			cvDestroyWindow(WINDOW_NAME);
+		}
 
 		if (waitKey(10) == 27)
 			break;

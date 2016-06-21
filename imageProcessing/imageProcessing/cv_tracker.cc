@@ -7,97 +7,22 @@ Tracker::Tracker(void) {}
 Tracker::~Tracker(void) {}
 
 // initilize (img = first frame, rc = select tracking object, cModel = color model)
-void Tracker::initilize(Mat img, Rect rc, COLOR_MODEL cModel)
+void Tracker::initilize(Mat img, Rect rc, COLOR_MODEL color_model)
 {
+	param.color_model = color_model;
+
 	if (my)
 	{
-		Mat roi(img, rc), hsv;
+		Mat hsv;
 		cvtColor(img, hsv, CV_BGR2HSV);
 
 		// show screen of color histogram each channels
 		double * hists = myHistogram(hsv, rc);
 		myShowHistogram(hists);
 		this->objectHists = hists;
-		rect = rc;
-		return;
-	}
-	// this is mask for calc histogram
-	Mat mask = Mat();
-	param.cModel = cModel;
-
-	if (img.channels() <= 1)
-	{
-		float vrange[] = { 0, 256 };
-		const float* phranges = vrange;
-		Mat roi(img, rc);
-		calcHist(&roi, 1, 0, mask, model, 1, &param.hist_bins, &phranges);
-	}
-	// switch with color model
-	// each switch run calcHist with colormodel
-	else
-	{
-		switch (param.cModel)
-		{
-			case CM_GRAY:
-			{
-				Mat gray;
-				cvtColor(img, gray, CV_BGR2GRAY);
-
-				float vrange[] = { 0,256 };
-				const float* phranges = vrange;
-				Mat target(gray, rc);
-				calcHist(&target, 1, 0, mask, model, 1, &param.hist_bins, &phranges);
-				imshow(APPLIED_NAME, gray);
-				imshow(APPLIED_TARGET_NAME, target);
-				break;
-			}
-			case CM_HUE:
-			{
-				Mat hsv;
-				cvtColor(img, hsv, CV_BGR2HSV);
-
-				float hrange[] = { 0,180 };
-				const float* phranges = hrange;
-				int channels[] = { 0 };
-				Mat target(hsv, rc);
-				calcHist(&target, 1, channels, mask, model, 1, &param.hist_bins, &phranges);
-				imshow(APPLIED_NAME, hsv);
-				imshow(APPLIED_TARGET_NAME, target);
-				break;
-			}
-			case CM_RGB:
-			{
-				float vrange[] = { 0,255 };
-				const float* ranges[] = { vrange, vrange, vrange };
-				int channels[] = { 0, 1, 2 };
-				int hist_sizes[] = { param.hist_bins, param.hist_bins, param.hist_bins };
-				Mat target(img, rc);
-				calcHist(&target, 1, channels, mask, model3d, 3, hist_sizes, ranges);
-				imshow(APPLIED_NAME, img);
-				imshow(APPLIED_TARGET_NAME, target);
-				break;
-			}
-			case CM_HSV:
-			{
-				Mat hsv;
-				cvtColor(img, hsv, CV_BGR2HSV);
-
-				float hrange[] = { 0,180 };
-				float vrange[] = { 0,255 };
-				const float* ranges[] = { hrange, vrange, vrange };
-				int channels[] = { 0, 1, 2 };
-				int hist_sizes[] = { param.hist_bins, param.hist_bins, param.hist_bins };
-				Mat target(hsv, rc);
-				calcHist(&target, 1, channels, mask, model3d, 3, hist_sizes, ranges);
-				imshow(APPLIED_NAME, hsv);
-				imshow(APPLIED_TARGET_NAME, target);
-				break;
-			}
-		}
 	}
 
-	maskproj = mask;
-	rect = rc;
+	cvHistogram(img, cvRect = myRect = rc);
 }
 
 // object tracking
@@ -108,14 +33,14 @@ bool Tracker::run(Mat img)
 		// mean shift
 		Mat hsv;
 		cvtColor(img, hsv, CV_BGR2HSV);
-		Rect nRect = rect, temp;
+		Rect nRect = myRect, temp, bRect = myRect;
 		double nX = 0, nY = 0, tW = 0, w;
 		do {
-			tW = 0, nX = 0; nY = 0; rect = nRect;
+			tW = 0, nX = 0; nY = 0; myRect = nRect;
 
 			// set searching area
-			temp = Rect(max(nRect.x - param.search_range, 0), max(nRect.y - param.search_range, 0),
-				min(nRect.width + param.search_range * 2, hsv.rows), min(nRect.height + param.search_range * 2, hsv.cols));
+			temp = Rect(max(nRect.x - (int)param.search_range, 0), max(nRect.y - (int)param.search_range, 0),
+				min(nRect.width + (int)param.search_range * 2, hsv.rows), min(nRect.height + (int)param.search_range * 2, hsv.cols));
 			double sRatioWidth = temp.width / param.sampling, sRatioHeight = temp.height / param.sampling;
 			for (int i = 0; i <= temp.width / 2; i+=sRatioWidth)
 				for (int j = 0; j <= temp.height / 2; j+=sRatioHeight)
@@ -135,127 +60,69 @@ bool Tracker::run(Mat img)
 			nX /= tW;
 			nY /= tW;
 
-			nRect = Rect(max((int)nX - nRect.width / 2, 0), max((int)nY - nRect.height / 2, 0), rect.width, rect.height);
-		} while (sqrt(pow(rect.x - nRect.x, 2) + pow(rect.y - nRect.y, 2)) > param.vector_size);
-		rect = nRect;
-		//this->objectHists = myHistogram(img, rect = nRect);
+			// get mean of w, if w > 0.3 make range narrow, or not make extend;
+			double twRatio = tW / ((temp.width / sRatioWidth) * (temp.height / sRatioHeight));
+			param.search_range *= (twRatio > (1/4) ? 0 : 1) + twRatio;
 
-		// back projection
+			nRect = Rect(max((int)nX - nRect.width / 2, 0), max((int)nY - nRect.height / 2, 0), myRect.width, myRect.height);
+		} while (sqrt(pow(myRect.x - nRect.x, 2) + pow(myRect.y - nRect.y, 2)) > param.search_range);
+
+		// check how moved, extend or narrow
+		// if moved long, range extend range, or not narrow range
+		double moved = (sqrt(pow(bRect.x - nRect.x, 2) + pow(bRect.y - nRect.y, 2))/ param.search_range);
+		param.search_range *= sqrt(moved);
+		param.search_range = min(max(param.search_range, SEARCH_MIN), SEARCH_MAX);
+
+		// update rect (object)
+		bRect = myRect = nRect;
+
+		// if search range is narrow enough, update model histogram,
+		if (param.search_range < (SEARCH_MAX + SEARCH_MIN) / 2)
+		{
+			double * nHists = myHistogram(hsv, nRect);
+			for (int i = 0; i < param.hist_bins; ++i)
+				this->objectHists[i] += (nHists[i] - objectHists[i]) * 0.1;
+		}
+
+		// back projection - show color histogram [ white is similar ]
 		Mat imx = hsv.clone();
 		for (int i = 0; i < hsv.cols; ++i)
-		{
 			for (int j = 0; j < hsv.rows; ++j)
 			{
 				w = myHistogramValue(imx, i, j, this->objectHists);
 				double pixel[] = { 255 * w, 255 * w, 255 * w };
 				matrixSet(imx, i, j, pixel);
 			}
-		}
-		imshow("backproj", imx);
+		imshow(MY_HISTOGRAM_NAME, imx);
 
 		// show tracking object rectangle of (0,255,0)
-		rectangle(img, rect, Scalar(0, 255, 0), 3, CV_AA);
-
-
-		return true;
+		rectangle(img, myRect, Scalar(0, 255, 0), 3, CV_AA);
 	}
+
 	// histogram backprojection
-	if (img.channels() <= 1)
-	{
-		float vrange[] = { 0,256 };
-		const float* phranges = vrange;
-		calcBackProject(&img, 1, 0, model, backproj, &phranges);
-	}
 	// swith with color model, run backprojection
+	Mat backproj;
+	cvBackProject(img, backproj);
+
+	if (cvMeanshift)
+		//mean shift
+		cvMeanShift(img, backproj, cvRect);
 	else
-	{
-		switch (param.cModel)
-		{
-			case CM_GRAY:
-			{
-				Mat gray;
-				cvtColor(img, gray, CV_BGR2GRAY);
+		//cam shift
+		cvCamShift(img, backproj, cvRect);
 
-				float vrange[] = { 0,256 };
-				const float* phranges = vrange;
-				calcBackProject(&gray, 1, 0, model, backproj, &phranges);
-				break;
-			}
-			case CM_HUE:
-			{
-				Mat hsv;
-				cvtColor(img, hsv, CV_BGR2HSV);
-
-				float hrange[] = { 0,180 };
-				const float* phranges = hrange;
-				int channels[] = { 0 };
-				calcBackProject(&hsv, 1, channels, model, backproj, &phranges);
-				break;
-			}
-			case CM_RGB:
-			{
-				float vrange[] = { 0,255 };
-				const float* ranges[] = { vrange, vrange, vrange };	// B,G,R
-				int channels[] = { 0, 1, 2 };
-				int hist_sizes[] = { param.hist_bins, param.hist_bins, param.hist_bins };
-				calcBackProject(&img, 1, channels, model3d, backproj, ranges);
-				break;
-			}
-			case CM_HSV:
-			{
-				Mat hsv;
-				cvtColor(img, hsv, CV_BGR2HSV);
-
-				float hrange[] = { 0,180 };
-				float vrange[] = { 0,255 };
-				const float* ranges[] = { hrange, vrange, vrange };	// hue, saturation, brightness
-				int channels[] = { 0, 1, 2 };
-				calcBackProject(&hsv, 1, channels, model3d, backproj, ranges);
-				break;
-			}
-		}
-	}
-
-	//mean shift
-	if (1)
-	{
-		int itrs = meanShift(backproj, rect, TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, param.max_itrs, 1));
-		rectangle(img, rect, Scalar(0, 255, 0), 3, CV_AA);
-	}
-	//cam shift
-	else
-	{
-		if (rect.width > 0 && rect.height > 0)
-		{
-			RotatedRect trackBox = CamShift(backproj, rect, TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, param.max_itrs, 1));
-			ellipse(img, trackBox, Scalar(0, 0, 255), 3, CV_AA);
-		}
-
-		if (rect.width <= 1 || rect.height <= 1)
-		{
-			int cols = backproj.cols, rows = backproj.rows, r = (MIN(cols, rows) + 5) / 6;
-			rect = Rect(rect.x - r, rect.y - r, rect.width + 2 * r, rect.height + 2 * r) & Rect(0, 0, cols, rows);
-		}
-	}
-
+	imshow(CV_TRACKER_NAME, img);
 	return true;
-}
-
-Mat Tracker::get_image()
-{
-	Mat ret;
-	normalize(backproj, ret, 0, 255, CV_MINMAX);
-	return ret;
 }
 
 double cv::Tracker::mySimilarity(const Mat& img, int x, int y, double * hists)
 {
 	double similarity = 0;
 
-	double * nHists = myHistogram(img, Rect(x - rect.width /2 , y - rect.height/2 , rect.width, rect.height));
+	double * nHists = myHistogram(img, Rect(x - myRect.width /2 , y - myRect.height/2 , myRect.width, myRect.height));
 
 	for (int i = 0; i < param.hist_bins; ++i)
-		similarity += sqrt(hists[i] * nHists[i]);
+		similarity += hists[i] * nHists[i];
 
 	return similarity;
 }
@@ -311,4 +178,150 @@ int Tracker::matrixAt(const Mat& img, int x, int y)
 double Tracker::myHistogramValue(const Mat& img, int x, int y, double * hists)
 {
 	return hists[matrixAt(img, x, y) / param.hist_bins];
+}
+
+void cv::Tracker::cvHistogram(const Mat & img, const Rect rc)
+{
+	Mat mask = Mat();
+	if (img.channels() <= 1)
+	{
+		float vrange[] = { 0, 256 };
+		const float* phranges = vrange;
+		Mat roi(img, rc);
+		calcHist(&roi, 1, 0, mask, model, 1, &param.hist_bins, &phranges);
+	}
+
+	// switch with color model
+	// each switch run calcHist with colormodel
+	else
+	{
+		switch (param.color_model)
+		{
+		case CM_GRAY:
+		{
+			Mat gray;
+			cvtColor(img, gray, CV_BGR2GRAY);
+
+			float vrange[] = { 0,256 };
+			const float* phranges = vrange;
+			Mat target(gray, rc);
+			calcHist(&target, 1, 0, mask, model, 1, &param.hist_bins, &phranges);
+			break;
+		}
+		case CM_HUE:
+		{
+			Mat hsv;
+			cvtColor(img, hsv, CV_BGR2HSV);
+
+			float hrange[] = { 0,180 };
+			const float* phranges = hrange;
+			int channels[] = { 0 };
+			Mat target(hsv, rc);
+			calcHist(&target, 1, channels, mask, model, 1, &param.hist_bins, &phranges);
+			break;
+		}
+		case CM_RGB:
+		{
+			float vrange[] = { 0,255 };
+			const float* ranges[] = { vrange, vrange, vrange };
+			int channels[] = { 0, 1, 2 };
+			int hist_sizes[] = { param.hist_bins, param.hist_bins, param.hist_bins };
+			Mat target(img, rc);
+			calcHist(&target, 1, channels, mask, model3d, 3, hist_sizes, ranges);
+			break;
+		}
+		case CM_HSV:
+		{
+			Mat hsv;
+			cvtColor(img, hsv, CV_BGR2HSV);
+
+			float hrange[] = { 0,180 };
+			float vrange[] = { 0,255 };
+			const float* ranges[] = { hrange, vrange, vrange };
+			int channels[] = { 0, 1, 2 };
+			int hist_sizes[] = { param.hist_bins, param.hist_bins, param.hist_bins };
+			Mat target(hsv, rc);
+			calcHist(&target, 1, channels, mask, model3d, 3, hist_sizes, ranges);
+			break;
+		}
+		}
+	}
+}
+
+void Tracker::cvBackProject(const Mat& img, Mat& backproj)
+{
+	if (img.channels() <= 1)
+	{
+		float vrange[] = { 0,256 };
+		const float* phranges = vrange;
+		calcBackProject(&img, 1, 0, model, backproj, &phranges);
+		return;
+	}
+
+	switch (param.color_model)
+	{
+		case CM_GRAY:
+		{
+			Mat gray;
+			cvtColor(img, gray, CV_BGR2GRAY);
+
+			float vrange[] = { 0,256 };
+			const float* phranges = vrange;
+			calcBackProject(&gray, 1, 0, model, backproj, &phranges);
+			break;
+		}
+		case CM_HUE:
+		{
+			Mat hsv;
+			cvtColor(img, hsv, CV_BGR2HSV);
+
+			float hrange[] = { 0,180 };
+			const float* phranges = hrange;
+			int channels[] = { 0 };
+			calcBackProject(&hsv, 1, channels, model, backproj, &phranges);
+			break;
+		}
+		case CM_RGB:
+		{
+			float vrange[] = { 0,255 };
+			const float* ranges[] = { vrange, vrange, vrange };	// B,G,R
+			int channels[] = { 0, 1, 2 };
+			int hist_sizes[] = { param.hist_bins, param.hist_bins, param.hist_bins };
+			calcBackProject(&img, 1, channels, model3d, backproj, ranges);
+			break;
+		}
+		case CM_HSV:
+		{
+			Mat hsv;
+			cvtColor(img, hsv, CV_BGR2HSV);
+
+			float hrange[] = { 0,180 };
+			float vrange[] = { 0,255 };
+			const float* ranges[] = { hrange, vrange, vrange };	// hue, saturation, brightness
+			int channels[] = { 0, 1, 2 };
+			calcBackProject(&hsv, 1, channels, model3d, backproj, ranges);
+			break;
+		}
+	}
+}
+
+void Tracker::cvMeanShift(Mat& img, const Mat& backproj, Rect rc)
+{
+	meanShift(backproj, rc, TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, param.max_itrs, 1));
+	rectangle(img, rc, Scalar(0, 0, 255), 3, CV_AA);
+}
+
+void cv::Tracker::cvCamShift(Mat& img, const Mat& backproj, Rect rc)
+{
+	if (rc.width > 0 && rc.height > 0)
+	{
+		RotatedRect trackBox = CamShift(backproj, rc, TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, param.max_itrs, 1));
+		ellipse(img, trackBox, Scalar(0, 0, 255), 3, CV_AA);
+	}
+
+	if (rc.width <= 1 || rc.height <= 1)
+	{
+		int cols = backproj.cols, rows = backproj.rows, r = (MIN(cols, rows) + 5) / 6;
+		rc = Rect(rc.x - r, rc.y - r, rc.width + 2 * r, rc.height + 2 * r) & Rect(0, 0, cols, rows);
+	}
 }
