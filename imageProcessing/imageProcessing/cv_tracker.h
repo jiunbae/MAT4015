@@ -28,11 +28,11 @@ namespace cv {
 
 		TrackerParam()
 		{
-			hist_bins = 32;
+			hist_bins = 16;
 			max_itrs = 32;
-			search_range = 32;
-			sampling = 8;
-			vector_size = 16;
+			search_range = 16;
+			sampling = 6;
+			vector_size = 8;
 			cModel = CM_HSV;
 		}
 	};
@@ -52,6 +52,7 @@ namespace cv {
 		MatND model3d;
 		Mat model, backproj, maskproj;
 		Rect rect;
+		double * objectHists;
 		char HistRatio = 8;
 		bool my = true;
 

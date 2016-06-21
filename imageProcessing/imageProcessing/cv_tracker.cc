@@ -23,6 +23,7 @@ void Tracker::initilize(Mat img, Rect rc, COLOR_MODEL cModel)
 				line(histImg, Point(i * HistRatio + j, param.hist_bins * HistRatio),
 					Point(i * HistRatio + j, (param.hist_bins - intensity * HistRatio) * HistRatio), Scalar::all(0));
 		}
+		this->objectHists = hists;
 		imshow("histogram", histImg);
 		rect = rc;
 		return;
@@ -113,29 +114,30 @@ bool Tracker::run(Mat img)
 	{
 		// mean shift
 		Rect nRect = rect, temp;
-		int nX = 0, nY = 0, tW = 0, w;
+		int nX = 0, nY = 0;
+		double tW = 0, w;
 		do {
 			nX = 0; nY = 0; rect = nRect;
 
 			// set searching area
-			Rect temp = Rect(max(nRect.x - param.search_range, 0), max(nRect.y - param.search_range, 0),
+			temp = Rect(max(nRect.x - param.search_range, 0), max(nRect.y - param.search_range, 0),
 				min(nRect.width + param.search_range * 2, img.rows), min(nRect.height + param.search_range * 2, img.cols));
-			for (int i = temp.x; i < temp.x + temp.width; ++i)
-				for (int j = temp.y; j < temp.y + temp.height; ++j)
+			for (int i = temp.x; i < temp.x + temp.width; i+=param.sampling)
+				for (int j = temp.y; j < temp.y + temp.height; j+=param.sampling)
 				{
-					double * nHists = myHistogram(img, temp);
-					w = mySimilarity(img, i, j, nHists);
+					w = mySimilarity(img, i, j, this->objectHists);
 					tW += w;
 					nX += w * i;
 					nY += w * j;
 				}
 			nX /= tW;
-			nX /= tW;
+			nY /= tW;
 
 			nRect = Rect(max(nX - nRect.width / 2, 0), max(nY - nRect.height / 2, 0), rect.width, rect.height);
-		} while (sqrt(pow(abs(rect.x - nRect.x), 2) + pow(abs(rect.y - nRect.y), 2)) > param.vector_size);
+		} while (sqrt(pow(rect.x - nRect.x, 2) + pow(rect.y - nRect.y, 2)) > param.vector_size);
+		rect = nRect;
 
-		// back projection
+		// show tracking object rectangle of (0,255,0)
 		rectangle(img, rect, Scalar(0, 255, 0), 3, CV_AA);
 
 
@@ -234,9 +236,9 @@ double cv::Tracker::mySimilarity(const Mat& img, int x, int y, double * hists)
 {
 	double similarity = 0;
 
-	int left = max(x - rect.width / 2, 0), right = min(x + rect.width / 2, img.size().width);
-	int down = max(y - rect.width / 2, 0), up = min(y + rect.width / 2, img.size().height);
-	Rect rc(left, down, left + right, down + up);
+	int left = x - rect.width / 2, right = x + rect.width / 2;
+	int down = y - rect.width / 2, up = y + rect.width / 2;
+	Rect rc(max(left, 0), max(down, 0), min(left + right, img.size().width), min(down + up,img.size().height));
 
 	double * nHists = myHistogram(img, rc);
 	for (int i = 0; i < param.hist_bins; ++i)
@@ -248,12 +250,13 @@ double cv::Tracker::mySimilarity(const Mat& img, int x, int y, double * hists)
 double * Tracker::myHistogram(const Mat& img, const Rect& rc)
 {
 	double * hists = (double*)calloc(param.hist_bins, sizeof(double)), hist_size = 256 / param.hist_bins;
-
-	for (int i = rc.x; i < rc.x + rc.width; ++i)
-		for (int j = rc.y; j < rc.y + rc.height; ++j)
+	int eWidth = min(rc.x + rc.width, img.size().width),
+		eHeight = min(rc.y + rc.height, img.size().height);
+	for (int i = rc.x; i < eWidth; ++i)
+		for (int j = rc.y; j < eHeight; ++j)
 			hists[myHistogramAt(img, i, j) / (int)hist_size]++;
 
-	int total = 0;
+	double total = 0;
 	for (int i = 0; i < param.hist_bins; ++i)
 		total += hists[i] * hists[i];
 	total = sqrt(total);
@@ -266,9 +269,9 @@ double * Tracker::myHistogram(const Mat& img, const Rect& rc)
 int Tracker::myHistogramAt(const Mat& img, int x, int y)
 {
 	int sum = 0;
-	uchar * value = img.data + y * img.step + x * img.elemSize();
+	uchar * data = (uchar *)img.data;
 	for (int k = 0; k < img.channels(); ++k)
-		sum += value[k] * this->param.channel_ratio[k];
+		sum += data[y * x + k] * this->param.channel_ratio[k];
 	return sum;
 }
 
