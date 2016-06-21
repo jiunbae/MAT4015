@@ -28,10 +28,10 @@ namespace cv {
 
 		TrackerParam()
 		{
-			hist_bins = 16;
+			hist_bins = 32;
 			max_itrs = 32;
 			search_range = 16;
-			sampling = 6;
+			sampling = 4;
 			vector_size = 8;
 			cModel = CM_HSV;
 		}
@@ -56,8 +56,11 @@ namespace cv {
 		char HistRatio = 8;
 		bool my = true;
 
+		void matrixSet(Mat&, int, int, double[]);
+		int matrixAt(const Mat&, int x, int y);
+
 	private:
-		int myHistogramAt(const Mat&, int x, int y);
+		void myShowHistogram(double *);
 		double * myHistogram(const Mat&, const Rect&);
 		double myHistogramValue(const Mat&, int x, int y, double*);
 		double mySimilarity(const Mat&, int x, int y, double*);
