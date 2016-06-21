@@ -28,9 +28,9 @@ namespace cv {
 
 		TrackerParam()
 		{
-			hist_bins = 32;
+			hist_bins = 16;
 			max_itrs = 32;
-			search_range = 16;
+			search_range = 32;
 			sampling = 4;
 			vector_size = 8;
 			cModel = CM_HSV;
