@@ -15,6 +15,9 @@ using namespace cv;
 #define CV_TRACKER_NAME "CV_tracking"
 
 static const double SEARCH_MIN = 4, SEARCH_MAX = 64;
+static const double RECT_EXTEND_MAX = 10, RECT_STEP = 2.5;
+static const double RECT_SIZE_MIN = pow(1/2, 2), RECT_SIZE_MAX = pow(3/2, 2);
+static const double EXTEND_LIMIT = 1 / 4;
 
 namespace cv {
 	// color model enum
@@ -24,7 +27,7 @@ namespace cv {
 	struct TrackerParam
 	{
 		COLOR_MODEL color_model;
-		double channel_ratio[3] = { 0.6, 0.2, 0.2 };
+		double channel_ratio[3] = { 0.5, 0.25, 0.25 };
 		// hists_bins mean how many bar in histogram
 		int hist_bins, max_itrs, sampling;
 		double search_range;
@@ -51,10 +54,13 @@ namespace cv {
 		TrackerParam param;
 		MatND model3d;
 		Mat model;
-		Rect cvRect, myRect;
+		Rect cvRect, myRect, rect;
 		double * objectHists;
+
+		// show histogram bar chart x8
 		char HistRatio = 8;
-		bool my = true;
+
+		// if off, openCV method apply camshift;
 		bool cvMeanshift = true;
 
 		// set value to matrix pixel
@@ -71,7 +77,6 @@ namespace cv {
 		void cvMeanShift(Mat&, const Mat&, Rect);
 		// cv::camshift
 		void cvCamShift(Mat&, const Mat&, Rect);
-
 
 		// histogram show
 		// param: histogram
@@ -90,7 +95,7 @@ namespace cv {
 		// calc histogram similarity
 		// param: img, x, y, hists to compare with
 		// we get hists in img, rect (x - w/2 to x + w/2, y same)
-		double mySimilarity(const Mat&, int x, int y, double*);
+		double mySimilarity(const Mat&, Rect, double*);
 	};
 }
 #endif

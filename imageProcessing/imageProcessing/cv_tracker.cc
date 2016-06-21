@@ -11,7 +11,7 @@ void Tracker::initilize(Mat img, Rect rc, COLOR_MODEL color_model)
 {
 	param.color_model = color_model;
 
-	if (my)
+	// my method
 	{
 		Mat hsv;
 		cvtColor(img, hsv, CV_BGR2HSV);
@@ -22,13 +22,16 @@ void Tracker::initilize(Mat img, Rect rc, COLOR_MODEL color_model)
 		this->objectHists = hists;
 	}
 
-	cvHistogram(img, cvRect = myRect = rc);
+	// openCV method
+	{
+		cvHistogram(img, rect = cvRect = myRect = rc);
+	}
 }
 
 // object tracking
 bool Tracker::run(Mat img)
 {
-	if (my)
+	// my method
 	{
 		// mean shift
 		Mat hsv;
@@ -45,13 +48,13 @@ bool Tracker::run(Mat img)
 			for (int i = 0; i <= temp.width / 2; i+=sRatioWidth)
 				for (int j = 0; j <= temp.height / 2; j+=sRatioHeight)
 				{
-					w = mySimilarity(hsv, temp.x + (temp.width / 2) + i, temp.y + (temp.height / 2) + j, this->objectHists);
+					w = mySimilarity(hsv, Rect(temp.x + (temp.width / 2) + i, temp.y + (temp.height / 2) + j, nRect.width, nRect.height), this->objectHists);
 					tW += w;
 					nX += w * (temp.x + (temp.width / 2) + i);
 					nY += w * (temp.y + (temp.height / 2) + j);
 					if (i != 0 || j != 0)
 					{
-						w = mySimilarity(hsv, temp.x + (temp.width / 2) - i, temp.y + (temp.height / 2) - j, this->objectHists);
+						w = mySimilarity(hsv, Rect(temp.x + (temp.width / 2) - i, temp.y + (temp.height / 2) - j, nRect.width, nRect.height), this->objectHists);
 						tW += w;
 						nX += w * (temp.x + (temp.width / 2) - i);
 						nY += w * (temp.y + (temp.height / 2) - j);
@@ -62,10 +65,23 @@ bool Tracker::run(Mat img)
 
 			// get mean of w, if w > 0.3 make range narrow, or not make extend;
 			double twRatio = tW / ((temp.width / sRatioWidth) * (temp.height / sRatioHeight));
-			param.search_range *= (twRatio > (1/4) ? 0 : 1) + twRatio;
+			param.search_range *= (twRatio > (EXTEND_LIMIT) ? 0 : 1) + twRatio;
 
 			nRect = Rect(max((int)nX - nRect.width / 2, 0), max((int)nY - nRect.height / 2, 0), myRect.width, myRect.height);
 		} while (sqrt(pow(myRect.x - nRect.x, 2) + pow(myRect.y - nRect.y, 2)) > param.search_range);
+
+		// resize object box.
+		/*tW = 0;
+		for (int i = nRect.width - (RECT_EXTEND_MAX / 2); i <= nRect.width + (RECT_EXTEND_MAX / 2); i += RECT_STEP)
+			for (int j = nRect.height - (RECT_EXTEND_MAX / 2); j <= nRect.height + (RECT_EXTEND_MAX / 2); j += RECT_STEP)
+			{
+				w = mySimilarity(hsv, temp = Rect(nX, nY, i, j), this->objectHists);
+				if (w > tW && i * j > RECT_SIZE_MIN && i * j < RECT_SIZE_MAX)
+				{
+					tW = w;
+					myRect = temp;
+				}
+			}*/
 
 		// check how moved, extend or narrow
 		// if moved long, range extend range, or not narrow range
@@ -77,12 +93,12 @@ bool Tracker::run(Mat img)
 		bRect = myRect = nRect;
 
 		// if search range is narrow enough, update model histogram,
-		if (param.search_range < (SEARCH_MAX + SEARCH_MIN) / 2)
+		/*if (param.search_range == SEARCH_MIN)
 		{
 			double * nHists = myHistogram(hsv, nRect);
 			for (int i = 0; i < param.hist_bins; ++i)
-				this->objectHists[i] += (nHists[i] - objectHists[i]) * 0.1;
-		}
+				this->objectHists[i] += (nHists[i] - objectHists[i]) * 0.05;
+		}*/
 
 		// back projection - show color histogram [ white is similar ]
 		Mat imx = hsv.clone();
@@ -99,27 +115,30 @@ bool Tracker::run(Mat img)
 		rectangle(img, myRect, Scalar(0, 255, 0), 3, CV_AA);
 	}
 
-	// histogram backprojection
-	// swith with color model, run backprojection
-	Mat backproj;
-	cvBackProject(img, backproj);
+	// openCV method
+	{
+		// histogram backprojection
+		// swith with color model, run backprojection
+		Mat backproj;
+		cvBackProject(img, backproj);
 
-	if (cvMeanshift)
-		//mean shift
-		cvMeanShift(img, backproj, cvRect);
-	else
-		//cam shift
-		cvCamShift(img, backproj, cvRect);
+		if (cvMeanshift)
+			//mean shift
+			cvMeanShift(img, backproj, cvRect);
+		else
+			//cam shift
+			cvCamShift(img, backproj, cvRect);
+	}
 
 	imshow(CV_TRACKER_NAME, img);
 	return true;
 }
 
-double cv::Tracker::mySimilarity(const Mat& img, int x, int y, double * hists)
+double cv::Tracker::mySimilarity(const Mat& img, Rect rc, double * hists)
 {
 	double similarity = 0;
 
-	double * nHists = myHistogram(img, Rect(x - myRect.width /2 , y - myRect.height/2 , myRect.width, myRect.height));
+	double * nHists = myHistogram(img, rc);
 
 	for (int i = 0; i < param.hist_bins; ++i)
 		similarity += hists[i] * nHists[i];
@@ -168,6 +187,7 @@ void Tracker::matrixSet(Mat& img, int x, int y, double pixel[])
 
 int Tracker::matrixAt(const Mat& img, int x, int y)
 {
+	if (x < 0 || y < 0 || x > img.size().width || y > img.size().height) return 0;
 	int sum = 0;
 	uchar * data = img.data + y*img.step + x * img.elemSize();
 	for (int k = 0; k < img.channels(); ++k)
