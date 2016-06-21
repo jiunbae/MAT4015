@@ -24,8 +24,7 @@ void Tracker::initilize(Mat img, Rect rc, COLOR_MODEL cModel)
 					Point(i * HistRatio + j, (param.hist_bins - intensity * HistRatio) * HistRatio), Scalar::all(0));
 		}
 		imshow("histogram", histImg);
-
-
+		rect = rc;
 		return;
 	}
 	// this is mask for calc histogram
@@ -112,6 +111,33 @@ bool Tracker::run(Mat img)
 {
 	if (my)
 	{
+		// mean shift
+		Rect nRect = rect, temp;
+		int nX = 0, nY = 0, tW = 0, w;
+		do {
+			nX = 0; nY = 0; rect = nRect;
+
+			// set searching area
+			Rect temp = Rect(max(nRect.x - param.search_range, 0), max(nRect.y - param.search_range, 0),
+				min(nRect.width + param.search_range * 2, img.rows), min(nRect.height + param.search_range * 2, img.cols));
+			for (int i = temp.x; i < temp.x + temp.width; ++i)
+				for (int j = temp.y; j < temp.y + temp.height; ++j)
+				{
+					double * nHists = myHistogram(img, temp);
+					w = mySimilarity(img, i, j, nHists);
+					tW += w;
+					nX += w * i;
+					nY += w * j;
+				}
+			nX /= tW;
+			nX /= tW;
+
+			nRect = Rect(max(nX - nRect.width / 2, 0), max(nY - nRect.height / 2, 0), rect.width, rect.height);
+		} while (sqrt(pow(abs(rect.x - nRect.x), 2) + pow(abs(rect.y - nRect.y), 2)) > param.vector_size);
+
+		// back projection
+		rectangle(img, rect, Scalar(0, 255, 0), 3, CV_AA);
+
 
 		return true;
 	}
@@ -204,12 +230,12 @@ Mat Tracker::get_image()
 	return ret;
 }
 
-double cv::Tracker::mySimilarity(const Mat& img, CvPoint point, double * hists)
+double cv::Tracker::mySimilarity(const Mat& img, int x, int y, double * hists)
 {
 	double similarity = 0;
 
-	int left = max(point.x - rect.width / 2, 0), right = min(point.x + rect.width / 2, img.size().width);
-	int down = max(point.y - rect.width / 2, 0), up = min(point.y + rect.width / 2, img.size().height);
+	int left = max(x - rect.width / 2, 0), right = min(x + rect.width / 2, img.size().width);
+	int down = max(y - rect.width / 2, 0), up = min(y + rect.width / 2, img.size().height);
 	Rect rc(left, down, left + right, down + up);
 
 	double * nHists = myHistogram(img, rc);

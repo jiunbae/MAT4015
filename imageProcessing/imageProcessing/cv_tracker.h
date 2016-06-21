@@ -14,21 +14,25 @@ using namespace cv;
 #define APPLIED_TARGET_NAME "applied target"
 
 namespace cv {
-
 	// color model enum
 	enum COLOR_MODEL { CM_HSV, CM_RGB, CM_HUE, CM_GRAY };
 
 	// tracker parameter
 	struct TrackerParam
 	{
-		int hist_bins;
-		int max_itrs;
 		COLOR_MODEL cModel;
+		double channel_ratio[3] = { 0.8, 0.1, 0.1 };
+		int hist_bins, max_itrs;
+		int search_range, sampling;
+		int vector_size;
 
 		TrackerParam()
 		{
 			hist_bins = 32;
 			max_itrs = 32;
+			search_range = 32;
+			sampling = 8;
+			vector_size = 16;
 			cModel = CM_HSV;
 		}
 	};
@@ -48,6 +52,14 @@ namespace cv {
 		MatND model3d;
 		Mat model, backproj, maskproj;
 		Rect rect;
+		char HistRatio = 8;
+		bool my = true;
+
+	private:
+		int myHistogramAt(const Mat&, int x, int y);
+		double * myHistogram(const Mat&, const Rect&);
+		double myHistogramValue(const Mat&, int x, int y, double*);
+		double mySimilarity(const Mat&, int x, int y, double*);
 	};
 }
 #endif
