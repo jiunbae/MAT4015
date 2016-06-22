@@ -14,10 +14,11 @@ using namespace cv;
 #define MY_TRACKER_NAME "MY_tracking"
 #define CV_TRACKER_NAME "CV_tracking"
 
-static const double SEARCH_MIN = 4, SEARCH_MAX = 64;
+static const double SEARCH_MIN = 4, SEARCH_MAX = 32;
+static const double EXTEND_LIMIT = (1 / 4.);
 static const double RECT_EXTEND_MAX = 10, RECT_STEP = 2.5;
-static const double RECT_SIZE_MIN = pow(1/2, 2), RECT_SIZE_MAX = pow(3/2, 2);
-static const double EXTEND_LIMIT = 1 / 4;
+static const double RECT_SIZE_MIN = (3 / 4.), RECT_SIZE_MAX = (5 / 4.);
+
 
 namespace cv {
 	// color model enum

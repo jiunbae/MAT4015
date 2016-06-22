@@ -3,6 +3,7 @@
 
 using namespace std;
 
+
 Tracker::Tracker(void) {}
 Tracker::~Tracker(void) {}
 
@@ -71,17 +72,17 @@ bool Tracker::run(Mat img)
 		} while (sqrt(pow(myRect.x - nRect.x, 2) + pow(myRect.y - nRect.y, 2)) > param.search_range);
 
 		// resize object box.
-		/*tW = 0;
+		tW = 0;
 		for (int i = nRect.width - (RECT_EXTEND_MAX / 2); i <= nRect.width + (RECT_EXTEND_MAX / 2); i += RECT_STEP)
 			for (int j = nRect.height - (RECT_EXTEND_MAX / 2); j <= nRect.height + (RECT_EXTEND_MAX / 2); j += RECT_STEP)
 			{
 				w = mySimilarity(hsv, temp = Rect(nX, nY, i, j), this->objectHists);
-				if (w > tW && i * j > RECT_SIZE_MIN && i * j < RECT_SIZE_MAX)
+				if (w > tW && i * j > RECT_SIZE_MIN * (rect.width * rect.height) && i * j < RECT_SIZE_MAX * (rect.width * rect.height))
 				{
 					tW = w;
-					myRect = temp;
+					nRect = temp;
 				}
-			}*/
+			}
 
 		// check how moved, extend or narrow
 		// if moved long, range extend range, or not narrow range
@@ -93,12 +94,12 @@ bool Tracker::run(Mat img)
 		bRect = myRect = nRect;
 
 		// if search range is narrow enough, update model histogram,
-		/*if (param.search_range == SEARCH_MIN)
+		if (param.search_range == SEARCH_MIN)
 		{
 			double * nHists = myHistogram(hsv, nRect);
 			for (int i = 0; i < param.hist_bins; ++i)
 				this->objectHists[i] += (nHists[i] - objectHists[i]) * 0.05;
-		}*/
+		}
 
 		// back projection - show color histogram [ white is similar ]
 		Mat imx = hsv.clone();
