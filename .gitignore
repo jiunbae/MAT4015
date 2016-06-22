@@ -1,3 +1,4 @@
 *.log
 *.tlog
 Debug/
+Release/
