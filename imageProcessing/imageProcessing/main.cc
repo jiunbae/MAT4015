@@ -1,3 +1,21 @@
+/////////////////////////////////////////////////
+// MaybeS: https://github.com/MaybeS/MAT4015.git
+// mean shift - object tracking.
+// + dynamic search range
+// + tracking object autosizing
+// + model histogram update
+//
+// default@opencv
+//@import 
+//- .\include
+//- .\lib\x86\vc12\bin
+//@debug
+//- opencv_world300d.lib
+//- opencv_ts300d.lib
+//@lib
+//- .\lib\x86\vc12\lib
+
+
 #include <iostream>
 #include <Windows.h>
 #include "cv_tracker.h"
