@@ -64,9 +64,9 @@ bool Tracker::run(Mat img)
 			nX /= tW;
 			nY /= tW;
 
-			// get mean of w, if w > 0.3 make range narrow, or not make extend;
+			// get mean of w, if w > 0.25 make range narrow, or not make extend;
 			double twRatio = tW / ((temp.width / sRatioWidth) * (temp.height / sRatioHeight));
-			param.search_range *= (twRatio > (EXTEND_LIMIT) ? 0 : 1) + twRatio;
+			param.search_range *= (twRatio > (EXTEND_LIMIT) ? 1 - twRatio : (1 - EXTEND_LIMIT) +twRatio);
 
 			nRect = Rect(max((int)nX - nRect.width / 2, 0), max((int)nY - nRect.height / 2, 0), myRect.width, myRect.height);
 		} while (sqrt(pow(myRect.x - nRect.x, 2) + pow(myRect.y - nRect.y, 2)) > param.search_range);
