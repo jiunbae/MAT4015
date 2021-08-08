@@ -9,6 +9,6 @@ Fundamentals of applied probability and random processes
 using OpenCV to test image processing[object tracking]
 
 ## Demo
-![demo](https://github.com/MaybeS/MAT4015/blob/master/imageProcessing/TESTED/tested.gif?raw=true)
+![demo](https://github.com/jiunbae/MAT4015/blob/master/imageProcessing/TESTED/tested.gif?raw=true)
 
 demo in /TESTED dir

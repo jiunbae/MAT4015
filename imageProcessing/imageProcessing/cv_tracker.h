@@ -1,7 +1,7 @@
 #pragma once
 
 /////////////////////////////////////////////////
-// MaybeS: https://github.com/MaybeS/MAT4015.git
+// jiunbae: https://github.com/jiunbae/MAT4015.git
 // mean shift - object tracking.
 // + dynamic search range
 // + tracking object autosizing

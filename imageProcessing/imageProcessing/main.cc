@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////
-// MaybeS: https://github.com/MaybeS/MAT4015.git
+// jiunbae: https://github.com/jiunbae/MAT4015.git
 // mean shift - object tracking.
 // + dynamic search range
 // + tracking object autosizing
@@ -33,7 +33,7 @@ int main(int argc, char * argv[])
 {
 	// print information
 	cout << "MAT4015 - project image tracking" << endl;
-	cout << "Developed by MaybeS(https://github.com/MaybeS), 2016" << endl;
+	cout << "Developed by jiunbae(https://github.com/jiunbae), 2016" << endl;
 	cout << "\tOpenCV Version: " << CV_VERSION << endl << endl;
 	
 	// get filename (select file dialog)
