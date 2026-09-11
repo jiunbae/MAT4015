@@ -1,0 +1,573 @@
+<title>MAT4015 응용확률및랜덤프로세스</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#F3F4F1; --surface:#FCFCFA; --surface-2:#EDEFEA;
+  --ink:#1A211C; --ink-soft:#5F6862; --ink-faint:#8A938C;
+  --rule:#DCE0DA; --rule-soft:#E7EAE4;
+  --accent:#2E5B4E; --accent-soft:#DDE9E3;
+  --mark:#A33027; --mark-soft:#F2DFDC;
+  --warn:#8E6416; --warn-soft:#F1E6CE;
+  --good:#41693C; --good-soft:#DFEBDC;
+  --shadow:0 1px 2px rgba(26,33,28,.05), 0 8px 24px -16px rgba(26,33,28,.22);
+  --f-display:"Newsreader",Georgia,"Times New Roman",serif;
+  --f-body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#121512; --surface:#191D19; --surface-2:#20251F;
+    --ink:#E4E8E1; --ink-soft:#98A199; --ink-faint:#6E776F;
+    --rule:#2A2F29; --rule-soft:#232823;
+    --accent:#78BCA5; --accent-soft:#1D2C27;
+    --mark:#E08A7F; --mark-soft:#2E1F1D;
+    --warn:#CFA155; --warn-soft:#2B2418;
+    --good:#86B87E; --good-soft:#1E2A1D;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#121512; --surface:#191D19; --surface-2:#20251F;
+  --ink:#E4E8E1; --ink-soft:#98A199; --ink-faint:#6E776F;
+  --rule:#2A2F29; --rule-soft:#232823;
+  --accent:#78BCA5; --accent-soft:#1D2C27;
+  --mark:#E08A7F; --mark-soft:#2E1F1D;
+  --warn:#CFA155; --warn-soft:#2B2418;
+  --good:#86B87E; --good-soft:#1E2A1D;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -16px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{
+  background:var(--ground); color:var(--ink);
+  font-family:var(--f-body); font-size:16px; line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:900px; margin:0 auto; padding-inline:20px; padding-block:0 96px}
+.prose{max-width:70ch}
+h1,h2,h3,h4{font-family:var(--f-display); font-weight:600; text-wrap:balance; margin:0; line-height:1.2}
+p{margin:0}
+a{color:var(--accent); text-underline-offset:3px}
+strong{font-weight:600}
+code{font-family:var(--f-mono); font-size:.86em; background:var(--surface-2); padding:.1em .34em; border-radius:3px; word-break:break-word}
+.lbl{font-family:var(--f-mono); font-size:11px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint)}
+
+/* ---------- masthead ---------- */
+.masthead{border-bottom:2px solid var(--ink); padding-block:40px 22px; margin-bottom:34px}
+.masthead .code{font-family:var(--f-mono); font-size:13px; font-weight:600; letter-spacing:.2em; color:var(--accent)}
+.masthead h1{font-size:clamp(32px,6vw,50px); margin-top:10px; letter-spacing:-.015em}
+.masthead .sub{font-family:var(--f-display); font-size:clamp(17px,2.6vw,21px); font-style:italic; color:var(--ink-soft); margin-top:12px; max-width:60ch}
+.headrow{display:flex; flex-wrap:wrap; gap:24px; align-items:flex-end; justify-content:space-between; margin-top:26px}
+.stats{display:flex; flex-wrap:wrap; gap:8px 30px}
+.stat .lbl{display:block}
+.stat b{font-family:var(--f-mono); font-size:15px; font-weight:500; font-variant-numeric:tabular-nums; display:block; margin-top:2px}
+.grade{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  min-width:104px; padding:10px 18px 12px; border:1.5px solid var(--mark); border-radius:2px;
+  color:var(--mark); background:var(--mark-soft); transform:rotate(-1.2deg);
+}
+.grade b{font-family:var(--f-display); font-size:38px; line-height:1; font-weight:600; letter-spacing:-.02em}
+.grade .lbl{color:var(--mark); opacity:.85; margin-top:5px}
+
+/* ---------- sections ---------- */
+section{margin-top:52px}
+section > h2{font-size:clamp(23px,3.6vw,29px); letter-spacing:-.01em; padding-bottom:10px; border-bottom:1px solid var(--rule)}
+section > h2 + p, section > h2 + .prose{margin-top:18px}
+.stack{display:flex; flex-direction:column; gap:16px; margin-top:22px}
+.stack-lg{display:flex; flex-direction:column; gap:26px; margin-top:24px}
+
+/* ---------- findings ---------- */
+.finding{
+  background:var(--surface); border:1px solid var(--rule); border-left:4px solid var(--ink-faint);
+  border-radius:3px; padding:20px 22px; box-shadow:var(--shadow);
+}
+.finding[data-sev="critical"]{border-left-color:var(--mark)}
+.finding[data-sev="major"]{border-left-color:var(--warn)}
+.finding[data-sev="minor"]{border-left-color:var(--ink-faint)}
+.finding > header{display:flex; flex-wrap:wrap; gap:6px 12px; align-items:baseline; margin-bottom:10px}
+.tier{font-family:var(--f-mono); font-size:11px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:2px 7px; border-radius:2px}
+[data-sev="critical"] .tier{color:var(--mark); background:var(--mark-soft)}
+[data-sev="major"] .tier{color:var(--warn); background:var(--warn-soft)}
+[data-sev="minor"] .tier{color:var(--ink-soft); background:var(--surface-2)}
+.finding h3{font-size:19px; flex:1 1 16ch}
+.finding p + p{margin-top:12px}
+.finding .prose{max-width:none}
+
+/* evidence strip: file:line + verbatim source */
+.ev{margin-top:14px; border:1px solid var(--rule-soft); border-radius:3px; overflow:hidden; background:var(--surface-2)}
+.ev-head{
+  font-family:var(--f-mono); font-size:11.5px; color:var(--ink-soft);
+  padding:6px 12px; border-bottom:1px solid var(--rule-soft); display:flex; gap:10px; flex-wrap:wrap;
+}
+.ev-head b{color:var(--ink); font-weight:600}
+.ev pre{margin:0; padding:12px 14px; overflow-x:auto; font-family:var(--f-mono); font-size:12.5px; line-height:1.6; color:var(--ink)}
+.ev pre .hl{color:var(--mark); font-weight:600}
+.ev pre .cm{color:var(--ink-faint)}
+
+/* standalone code block */
+pre.code{
+  margin:16px 0 0; padding:14px 16px; overflow-x:auto; background:var(--surface-2);
+  border:1px solid var(--rule-soft); border-radius:3px;
+  font-family:var(--f-mono); font-size:12.5px; line-height:1.6;
+}
+
+/* ---------- verdict table ---------- */
+.tbl-wrap{overflow-x:auto; margin-top:22px; border:1px solid var(--rule); border-radius:3px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:520px; font-size:14.5px}
+th,td{text-align:left; padding:11px 14px; border-bottom:1px solid var(--rule-soft); vertical-align:top}
+thead th{font-family:var(--f-mono); font-size:11px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); background:var(--surface-2)}
+tbody tr:last-child td{border-bottom:0}
+td.num{font-family:var(--f-mono); font-variant-numeric:tabular-nums; white-space:nowrap}
+td.g{font-family:var(--f-display); font-size:19px; font-weight:600; white-space:nowrap}
+.g-hi{color:var(--good)} .g-mid{color:var(--warn)} .g-lo{color:var(--mark)}
+
+/* ---------- callouts ---------- */
+.note{border-left:3px solid var(--accent); background:var(--accent-soft); padding:14px 18px; border-radius:0 3px 3px 0}
+.note.good{border-left-color:var(--good); background:var(--good-soft)}
+.note .lbl{color:inherit; opacity:.7; display:block; margin-bottom:6px}
+
+/* ---------- misc ---------- */
+ul,ol{margin:12px 0 0; padding-left:22px}
+li{margin-top:7px}
+li::marker{color:var(--ink-faint)}
+.rank{counter-reset:rk; list-style:none; padding-left:0}
+.rank li{counter-increment:rk; display:flex; gap:14px; margin-top:14px}
+.rank li::before{
+  content:counter(rk); font-family:var(--f-mono); font-size:12px; font-weight:600; color:var(--accent);
+  border:1px solid var(--accent); border-radius:50%; width:24px; height:24px; flex:0 0 24px;
+  display:flex; align-items:center; justify-content:center; margin-top:2px;
+}
+footer{margin-top:64px; padding-top:20px; border-top:1px solid var(--rule); color:var(--ink-faint); font-size:13px}
+footer p + p{margin-top:6px}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+@media (max-width:520px){
+  .grade{transform:none}
+  .masthead{padding-block:30px 18px}
+}
+</style>
+
+<div class="wrap">
+
+  <!-- ============ MASTHEAD ============ -->
+  <header class="masthead">
+    <div class="code">MAT4015 · HANYANG UNIV · 2016 SPRING</div>
+    <h1>응용확률및랜덤프로세스</h1>
+    <p class="sub">OpenCV API 나열이 아니라 직접 구현한 추적기가 맞다. 다만 확률적 근거가 같은 레포에 들어 있는 강의자료와 어긋나 있고, 비교 대상으로 세운 OpenCV 베이스라인은 <code>Rect</code>를 값으로 넘기는 바람에 단 한 프레임도 추적하지 않는다.</p>
+    <div class="headrow">
+      <div class="stats">
+        <div class="stat"><span class="lbl">저자 코드</span><b>646줄 / 3파일</b></div>
+        <div class="stat"><span class="lbl">커밋</span><b>32</b></div>
+        <div class="stat"><span class="lbl">기간</span><b>2016.04–06</b></div>
+        <div class="stat"><span class="lbl">스택</span><b>C++ / OpenCV 3.0</b></div>
+        <div class="stat"><span class="lbl">레포 크기</span><b>699 MB</b></div>
+      </div>
+      <div class="grade"><b>C</b><span class="lbl">종합</span></div>
+    </div>
+  </header>
+
+  <!-- ============ 총평 ============ -->
+  <section>
+    <h2>총평</h2>
+    <div class="prose stack">
+      <p>확률 과목의 제출물이 OpenCV 객체 추적이라는 점부터 짚고 시작하자. <code>docs/</code>에 들어 있는 두 PDF는 이상화 교수의 강의자료(<code>mean_shift.pdf</code> 46쪽, 표지에 Comaniciu &amp; Meer, IEEE T. PAMI 2002 인용, "[2016년 1학기 확률및통계]" / <code>image_processing.pdf</code> 39쪽)이고, <code>object_tracking.pptx</code> 18장이 학생 발표자료다. 즉 mean shift를 커널 밀도 추정의 모드 탐색으로 유도하는 수업을 듣고, 그것을 영상 추적으로 구현해 오라는 과제다. 판정의 핵심은 하나다 — 그 확률적 근거가 코드에 살아 있는가.</p>
+
+      <p><strong>먼저 가장 중요한 사실부터. 이것은 라이브러리 호출 나열이 아니다.</strong> <code>cv_tracker.cc</code>는 한 파일 안에 두 개의 추적기를 나란히 돌린다. 하나는 <code>myHistogram</code> / <code>mySimilarity</code> / 직접 짠 반복 탐색 루프 / 원시 포인터 픽셀 접근(<code>matrixAt</code>)으로 이루어진 자작 구현이고, 다른 하나는 <code>calcHist</code> → <code>calcBackProject</code> → <code>meanShift</code>를 부르는 OpenCV 베이스라인이다. 같은 창에 초록 박스(자작)와 빨간 박스(OpenCV)를 함께 그려 비교하려 한 설계는 이 과제에서 옳은 실험 감각이다. 히스토그램·역투영·반복 이동이라는 뼈대도 제자리에 있다.</p>
+
+      <p><strong>그런데 그 비교가 성립하지 않는다.</strong> <code>cvMeanShift</code>가 <code>Rect</code>를 값으로 받기 때문에 OpenCV가 갱신한 위치는 호출자에게 돌아오지 않는다. 베이스라인은 매 프레임 최초 ROI에서 다시 시작하며, 목표를 따라가지 않는다. 레포에 커밋된 데모 GIF가 이것을 그대로 보여준다 — 초록 박스는 대상을 따라 화면을 가로지르는데 빨간 박스는 제자리에서 떨고만 있다. 프로젝트 전체의 주장인 "내 방법 vs OpenCV"가 의도치 않게 조작된 셈이다.</p>
+
+      <p><strong>그리고 확률적 근거는 강의자료와 어긋나 있다.</strong> <code>myHistogram</code>은 히스토그램을 합이 아니라 <strong>L2 노름</strong>으로 나눈다. 결과는 단위벡터이지 확률질량함수가 아니다. <code>mySimilarity</code>는 두 벡터의 <strong>단순 내적</strong>을 유사도로 쓴다. Bhattacharyya 계수 Σ√(p·q)의 제곱근이 빠져 있다. 커널 프로파일(Epanechnikov/Gaussian)은 코드 어디에도 없어서, 강의자료가 46쪽에 걸쳐 세우는 밀도 추정의 토대 자체가 구현에 존재하지 않는다. 발표자료 9장이 "Modification version of Bhattacharyya distance"라고 스스로 밝히고 있으니 의도적 변형이긴 하나, 하필 확률분포 간 거리를 성립시키는 두 요소를 동시에 버린 변형이다. 같은 레포의 <code>example/open.c:353</code>에는 정석대로 <code>sqrt(histogram[i] * next_frame_histogram[i])</code>가 들어 있다.</p>
+
+      <p>여기에 좌표 규약이 두 군데서 엇갈리는 문제가 겹친다. mean shift 루프의 결과는 사실상 버려지고, 화면에 그려지는 박스는 "박스 크기 자동조정" 단계가 우연히 결정한다. 정지 화면에 정답 위치로 초기화해도 박스가 흘러간다(아래 수치 검증). 학부 과제 기준에서 자작 구현을 해냈다는 사실은 분명한 가점이지만, 그 구현이 이 과목이 가르친 확률론의 어느 부분도 정확히 반영하지 못한다는 점이 감점의 전부다.</p>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>모듈</th><th>내용</th><th>핵심 판정</th><th>등급</th></tr></thead>
+        <tbody>
+          <tr><td class="num">A</td><td>자작 mean-shift 추적기<br><code>cv_tracker.cc</code> "my method"</td><td>직접 구현은 진짜다. 다만 확률적 근거가 틀렸고 루프 출력이 버려진다</td><td class="g g-mid">C+</td></tr>
+          <tr><td class="num">B</td><td>OpenCV 베이스라인<br><code>cv_tracker.cc</code> "openCV method"</td><td><code>Rect</code> 값 전달로 추적이 아예 일어나지 않음. CamShift 분기는 도달 불가</td><td class="g g-lo">D</td></tr>
+          <tr><td class="num">C</td><td>프레임 루프 / ROI 입력<br><code>main.cc</code></td><td>역방향 드래그가 가드를 통과해 예외로 죽음. 추적 실패 복구 없음</td><td class="g g-lo">C-</td></tr>
+          <tr><td class="num">D</td><td>문서<br><code>docs/object_tracking.pptx</code></td><td>구조는 성실하고 변형을 자백한 점은 정직. 13장은 구현보다 앞서감</td><td class="g g-mid">B-</td></tr>
+          <tr><td class="num">E</td><td>레포 위생</td><td>699MB. OpenCV SDK 전체 + 60MB avi 커밋, LICENSE 없음</td><td class="g g-lo">F</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ A. 자작 추적기 ============ -->
+  <section>
+    <h2>A — 자작 mean-shift 추적기</h2>
+    <p class="prose">평가 대상 코드는 <code>cv_tracker.cc</code> 348줄, <code>main.cc</code> 180줄, <code>cv_tracker.h</code> 118줄로 합계 646줄이다. 레포의 C/C++ 총합 81,973줄 중 나머지 약 81,000줄은 벤더링된 OpenCV 헤더(<code>include/opencv2/</code>, <code>include/opencv/</code>)이므로 저자 작업량이 아니다. 그 646줄 중 자작 추적기는 <code>Tracker::run</code>의 첫 블록(<code>cv_tracker.cc:35–117</code>)과 <code>myHistogram</code> / <code>mySimilarity</code> / <code>matrixAt</code>에 해당한다.</p>
+    <div class="stack-lg">
+
+      <article class="finding" data-sev="critical">
+        <header><span class="tier">치명적</span><h3>히스토그램이 확률분포가 아니고, 유사도가 Bhattacharyya 계수가 아니다</h3></header>
+        <div class="prose">
+          <p>정규화가 <code>total += hists[i] * hists[i]</code> 후 <code>sqrt</code>, 즉 L2 노름이다. 이렇게 나누면 Σp<sub>i</sub> = 1이 성립하지 않으므로 결과는 확률질량함수가 아니라 단위벡터다. 이어서 유사도는 <code>hists[i] * nHists[i]</code>의 합, 곧 두 단위벡터의 내적(코사인 유사도)이다.</p>
+          <p>강의자료가 다루는 Bhattacharyya 계수는 ρ(p,q) = Σ√(p<sub>i</sub>q<sub>i</sub>)이고, 이 값이 [0,1]에 갇히고 √(1−ρ)가 거리가 되는 근거는 p와 q가 <strong>확률분포라는 데서</strong> 나온다. 제곱근을 빼고 L1 정규화를 L2로 바꾸면 그 근거가 둘 다 사라진다. 남는 것은 추적에 쓸 수는 있지만 확률론적 해석이 없는 벡터 내적이다.</p>
+          <p>결정적인 대조는 같은 레포 안에 있다. <code>example/open.c</code>는 정석 형태를 그대로 갖고 있다.</p>
+        </div>
+        <div class="ev">
+          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.cc</b><span>:159–164, 144–145</span></div>
+          <pre>	<span class="cm">// myHistogram — L1이 아니라 L2로 정규화</span>
+	double total = 0;
+	for (int i = 0; i &lt; param.hist_bins; ++i)
+		<span class="hl">total += hists[i] * hists[i];</span>
+	total = sqrt(total);
+	for (int i = 0; i &lt; param.hist_bins; ++i)
+		hists[i] /= total;
+
+	<span class="cm">// mySimilarity — 제곱근 없는 내적</span>
+	for (int i = 0; i &lt; param.hist_bins; ++i)
+		<span class="hl">similarity += hists[i] * nHists[i];</span></pre>
+        </div>
+        <div class="ev">
+          <div class="ev-head"><b>imageProcessing/example/open.c</b><span>:351–354 · 같은 레포의 정석 구현</span></div>
+          <pre>	for (int i = 0; i &lt; 16; i++)
+	{
+		<span class="hl">w += sqrt(histogram[i] * next_frame_histogram[i]);</span>
+	}</pre>
+        </div>
+        <div class="prose">
+          <p>더불어 커널 프로파일이 없다. 코드 전체에 Epanechnikov도 Gaussian도, 중심에서 멀어질수록 가중치를 줄이는 어떤 공간 가중도 존재하지 않는다. Comaniciu &amp; Meer의 mean shift 벡터가 커널 미분에서 유도된다는 점을 생각하면, 이것은 구현 세부의 누락이 아니라 방법의 토대가 빠진 것이다.</p>
+        </div>
+      </article>
+
+      <article class="finding" data-sev="critical">
+        <header><span class="tier">치명적</span><h3>좌표 규약이 두 곳에서 엇갈려, mean shift 루프의 결과가 버려진다</h3></header>
+        <div class="prose">
+          <p>후보 윈도를 만드는 <code>:52</code>는 <code>Rect(x, y, w, h)</code>의 첫 두 인자, 즉 <strong>좌상단</strong> 자리에 <code>temp.x + temp.width/2</code>를 넣는다. 그런데 이 값은 계산해 보면 <code>nRect.x + nRect.width/2</code>, 곧 객체의 <strong>중심</strong>이다. 따라서 <code>nX</code>는 "좌상단 좌표들의 가중평균"이 된다.</p>
+          <p>루프를 닫는 <code>:71</code>은 그 <code>nX</code>를 <strong>중심으로 보고</strong> <code>nX - width/2</code>를 한다. 반면 루프 직후 박스 크기를 고르는 <code>:79</code>는 같은 <code>nX</code>를 <strong>좌상단으로 보고</strong> 그대로 쓴다. 둘 중 하나만 맞을 수 있다.</p>
+        </div>
+        <div class="ev">
+          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.cc</b><span>:52 / :71 / :79</span></div>
+          <pre><span class="cm">// :52  중심 좌표를 Rect의 "좌상단" 자리에 넣는다</span>
+w = mySimilarity(hsv, Rect(<span class="hl">temp.x + (temp.width / 2) + i</span>, temp.y + (temp.height / 2) + j, nRect.width, nRect.height), this-&gt;objectHists);
+
+<span class="cm">// :71  nX를 "중심"으로 간주해 절반을 뺀다</span>
+nRect = Rect(max(<span class="hl">(int)nX - nRect.width / 2</span>, 0), max((int)nY - nRect.height / 2, 0), myRect.width, myRect.height);
+
+<span class="cm">// :79  같은 nX를 이번엔 "좌상단"으로 쓴다 — 위와 모순</span>
+w = mySimilarity(hsv, temp = Rect(<span class="hl">nX, nY</span>, i, j), this-&gt;objectHists);</pre>
+        </div>
+        <div class="prose">
+          <p>결과를 확인하려고 <code>:42–91</code>의 산술을 그대로 Python으로 옮겨 합성 프레임(320×240, 객체 <code>(100,80,60,50)</code>)에서 돌렸다. 정지 화면에 정답 위치로 초기화했으므로 올바른 추적기라면 영원히 <code>(100,80)</code>에 머물러야 한다.</p>
+        </div>
+        <pre class="code"><span class="cm">// cv_tracker.cc:42-91 산술을 포팅해 실행한 결과</span>
+frame  1: mean shift 루프 출력(:71) = (70, 54)   그려진 박스(:83) = (100, 79, 55, 51)
+frame  2: mean shift 루프 출력(:71) = (75, 54)   그려진 박스(:83) = (102, 79, 52, 51)
+frame  3: mean shift 루프 출력(:71) = (78, 54)   그려진 박스(:83) = (104, 79, 49, 51)
+frame  5: ...                                   그려진 박스        = (106, 79, 47, 51)
+frame 20: ...                                   그려진 박스        = (106, 79, 48, 51)
+
+정답 = (100, 80, 60, 50)   half-box = (30, 25)</pre>
+        <div class="prose">
+          <p>두 가지가 드러난다. 첫째, mean shift 루프 자체는 정확히 박스 절반만큼 어긋난 <code>(70,54)</code>에 수렴한다 — <code>(100,80)</code>에서 <code>(30,25)</code>를 뺀 값이다. 둘째, 화면에 그려지는 박스가 그래도 객체 위에 있는 이유는 <code>:83</code>의 <code>nRect = temp;</code>가 루프 결과를 덮어쓰기 때문이다. <strong>즉 실제 위치 결정은 mean shift가 아니라 "박스 크기 자동조정" 단계가 하고 있고, mean shift 루프의 출력은 다음 반복의 탐색 중심으로만 쓰이다 폐기된다.</strong> 헤더가 자랑하는 부가기능(<code>cv_tracker.h:7</code> "tracking object autosizing")이 본 알고리즘을 대체해 버린 셈이다.</p>
+          <p>부수 효과도 측정된다. 완전한 정지 화면인데도 박스가 x로 6px 밀리고 폭이 60에서 45–55 사이로 줄었다 늘었다 한다. 탐색창이 절반 어긋난 위치를 기준으로 잡히기 때문이다.</p>
+        </div>
+      </article>
+
+      <article class="finding" data-sev="major">
+        <header><span class="tier">중대</span><h3>반복 상한이 없고, 수렴 판정 기준을 루프 안에서 스스로 줄인다</h3></header>
+        <div class="prose">
+          <p><code>TrackerParam::max_itrs = 32</code>(<code>cv_tracker.h:56</code>)은 정의돼 있지만, 코드 전체에서 이 값을 읽는 곳은 <code>:331</code>과 <code>:339</code>, 즉 OpenCV <code>TermCriteria</code>뿐이다. 자작 루프에는 반복 상한이 없다.</p>
+          <p>대신 종료 조건은 이동거리가 <code>param.search_range</code> 이하가 되는 것인데, 그 <code>search_range</code>를 루프 <strong>안에서</strong> <code>:69</code>가 매 반복 줄인다. 새 계수는 <code>twRatio &gt; 0.25</code>이면 <code>1 - twRatio</code>(최대 0.75), 아니면 <code>0.75 + twRatio</code>(최대 1.0)이다. <strong>어느 쪽이든 1을 넘지 못하므로 탐색 반경은 단조 감소한다.</strong> 매 반복 임계값이 좁아지는 종료 조건이라 수렴 보장이 없다.</p>
+        </div>
+        <div class="ev">
+          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.cc</b><span>:69, :72, :91</span></div>
+          <pre><span class="cm">// :69  계수가 절대 1을 넘지 않는다 → 탐색 반경 단조 감소</span>
+param.search_range *= (twRatio &gt; (EXTEND_LIMIT) ? <span class="hl">1 - twRatio</span> : <span class="hl">(1 - EXTEND_LIMIT) +twRatio</span>);
+<span class="cm">// :72  그 줄어든 값이 곧 수렴 임계값</span>
+} while (sqrt(pow(myRect.x - nRect.x, 2) + pow(myRect.y - nRect.y, 2)) <span class="hl">&gt; param.search_range</span>);
+<span class="cm">// :91  하한 클램프는 루프가 끝난 뒤에야 걸린다</span>
+param.search_range = min(max(param.search_range, SEARCH_MIN), SEARCH_MAX);</pre>
+        </div>
+        <div class="prose">
+          <p>하한 <code>SEARCH_MIN = 4</code>는 <code>:91</code>, 즉 루프를 빠져나온 뒤에만 적용된다. 루프 안에서는 반경이 0에 임의로 가까워질 수 있다. 위 시뮬레이션에서 <code>search_range</code>는 1프레임 만에 하한 4.0에 붙어 그 뒤로 움직이지 않았고, 이는 헤더가 내건 "dynamic search range"(<code>cv_tracker.h:6</code>)가 사실상 무력화되었다는 뜻이다.</p>
+          <p>더 나쁜 잠재 위험이 <code>:48</code>에 있다. <code>temp.width / param.sampling</code>은 양쪽이 <code>int</code>이므로 정수 나눗셈이고, <code>temp.width &lt; 8</code>이면 보폭이 0이 된다. 그러면 <code>:49</code>의 <code>i += sRatioWidth</code>가 영원히 전진하지 않는다. <code>main.cc:97</code>의 ROI 가드가 넓이만 보므로 4×30 같은 가늘고 긴 박스(넓이 120)면 이 경로에 들어갈 수 있다.</p>
+        </div>
+      </article>
+
+      <article class="finding" data-sev="major">
+        <header><span class="tier">중대</span><h3>후보 하나마다 <code>calloc</code>, 그리고 <code>free</code>는 레포 어디에도 없다</h3></header>
+        <div class="prose">
+          <p><code>myHistogram</code>은 호출될 때마다 <code>calloc</code>으로 새 배열을 할당해 반환한다. 이것을 매 후보 윈도마다 호출하는 것이 <code>mySimilarity</code>다. <code>grep</code>으로 확인한 결과 <code>cv_tracker.cc</code>와 <code>main.cc</code>를 통틀어 <code>free()</code> 호출은 <strong>0건</strong>이고, 유일한 <code>delete</code>는 <code>main.cc:67</code>에 주석 처리되어 있다.</p>
+        </div>
+        <div class="ev">
+          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.cc</b><span>:142, :152 · 대응하는 free 없음</span></div>
+          <pre><span class="cm">// :142  후보 윈도마다 한 번씩</span>
+	double * nHists = myHistogram(img, rc);
+<span class="cm">// :152  매번 새 할당, NULL 검사도 없음</span>
+	double * hists = <span class="hl">(double*)calloc(param.hist_bins, sizeof(double))</span>, hist_size = 256 / param.hist_bins;</pre>
+        </div>
+        <div class="prose">
+          <p>프레임당 호출 횟수는 탐색 격자(<code>:49–63</code>, 약 50–80회) × 반복 횟수(측정값 3–6회)에 크기 탐색(<code>:76–85</code>, 약 25회)과 <code>:99</code>의 모델 갱신을 더한 값이다. 시뮬레이션에서 관측된 반복 수 기준으로 프레임당 200–500회, 회당 128바이트이면 프레임당 25–60KB가 새고 재생 시간에 비례해 선형으로 증가한다. 240프레임짜리 데모 하나가 수 MB 규모다.</p>
+          <p><code>initilize</code>의 <code>this-&gt;objectHists</code>(<code>:23</code>)도 소멸자 <code>Tracker::~Tracker(void) {}</code>(<code>:8</code>)가 비어 있어 해제되지 않는다.</p>
+        </div>
+      </article>
+
+      <article class="finding" data-sev="minor">
+        <header><span class="tier">경미</span><h3>탐색창 클램프에서 rows와 cols가 뒤바뀌어 있다</h3></header>
+        <div class="prose">
+          <p>폭을 <code>hsv.rows</code>(세로 픽셀 수)로, 높이를 <code>hsv.cols</code>(가로 픽셀 수)로 자른다. 가로 영상에 작은 박스라면 클램프가 애초에 걸리지 않아 드러나지 않지만, 세로 영상이나 큰 ROI에서는 틀린 경계가 된다. 같은 실수가 <code>example/open.c:97</code>, <code>:110</code>에도 있다.</p>
+        </div>
+        <div class="ev">
+          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.cc</b><span>:46–47</span></div>
+          <pre>			temp = Rect(max(nRect.x - (int)param.search_range, 0), max(nRect.y - (int)param.search_range, 0),
+				min(nRect.width + (int)param.search_range * 2, <span class="hl">hsv.rows</span>), min(nRect.height + (int)param.search_range * 2, <span class="hl">hsv.cols</span>));</pre>
+        </div>
+      </article>
+
+      <article class="finding" data-sev="minor">
+        <header><span class="tier">경미</span><h3>역투영 인덱싱이 <code>hist_bins == 16</code>에서만 우연히 맞는다</h3></header>
+        <div class="prose">
+          <p><code>myHistogram</code>은 <code>256 / hist_bins</code>로 나눠 bin을 정하는데(<code>:152, :157</code>), <code>myHistogramValue</code>는 <code>hist_bins</code>로 나눈다(<code>:201</code>). 두 값이 같아지는 경우는 <code>hist_bins = 16</code>뿐이고, 기본값이 정확히 16이라 지금은 동작한다. 파라미터를 바꾸는 순간 배열 밖을 읽는다.</p>
+        </div>
+        <div class="ev">
+          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.cc</b><span>:201 vs :152</span></div>
+          <pre><span class="cm">// :152  bin 폭 = 256 / hist_bins</span>
+double * hists = ..., <span class="hl">hist_size = 256 / param.hist_bins</span>;
+<span class="cm">// :201  나누는 수가 다르다</span>
+return hists[matrixAt(img, x, y) / <span class="hl">param.hist_bins</span>];</pre>
+        </div>
+        <pre class="code"><span class="cm">// 인덱스 상한 계산 결과</span>
+hist_bins= 8: myHistogram 최대 idx=  7 (배열 크기 8) | myHistogramValue 최대 idx= 31  → OUT OF BOUNDS
+hist_bins=16: myHistogram 최대 idx= 15 (배열 크기 16)| myHistogramValue 최대 idx= 15  → ok
+hist_bins=32: myHistogram 최대 idx= 31 (배열 크기 32)| myHistogramValue 최대 idx=  7  → ok</pre>
+        <div class="prose">
+          <p>덧붙여 <code>matrixAt</code>의 경계 검사 <code>x &gt; img.size().width</code>(<code>:191</code>)는 <code>&gt;=</code>여야 한다. 폭과 같은 좌표가 통과해 한 픽셀 너머를 읽는다.</p>
+        </div>
+      </article>
+
+      <article class="finding" data-sev="minor">
+        <header><span class="tier">경미</span><h3>모델 히스토그램 갱신 가드가 항상 열려 있다</h3></header>
+        <div class="prose">
+          <p><code>:97</code>의 <code>if (param.search_range == SEARCH_MIN)</code>은 "충분히 수렴했을 때만 모델을 갱신한다"는 의도의 가드다. 그런데 앞서 본 대로 <code>:69</code>의 계수가 1을 넘지 못해 탐색 반경은 첫 프레임에 하한 4.0에 도달한 뒤 계속 그 값이다(시뮬레이션 확인). 결과적으로 조건은 <strong>매 프레임 참</strong>이 되고, 모델은 현재 박스가 덮은 영역으로 무조건 0.05씩 끌려간다. 추적이 빗나가도 이를 막을 유사도 임계값은 없다. 전형적인 model drift 구조다.</p>
+        </div>
+      </article>
+
+    </div>
+    <div class="note good" style="margin-top:22px">
+      <span class="lbl">잘한 것</span>
+      <p><code>matrixAt</code>(<code>:189–197</code>)에서 <code>img.data + y*img.step + x*img.elemSize()</code>로 직접 포인터 산술을 하고 채널을 <code>channel_ratio</code>로 가중 합산한 부분은, <code>cvGet2D</code>를 쓰는 <code>example/open.c:245</code> 방식보다 명백히 빠르고 의도가 분명하다. L2 노름을 <code>example/open.c:341</code>처럼 <code>int total</code>에 누적해 잘라먹지 않고 <code>double total</code>(<code>:159</code>)로 받은 것도 <code>cv_tracker.cc</code>가 개선한 지점이다.</p>
+    </div>
+  </section>
+
+  <!-- ============ B. OpenCV 베이스라인 ============ -->
+  <section>
+    <h2>B — OpenCV 베이스라인과 프레임 루프</h2>
+    <p class="prose">브리프의 질문 — "OpenCV의 <code>meanShift</code>/<code>CamShift</code>를 그냥 호출했는가" — 에 대한 답은 "호출했지만, 그것은 자작 구현의 <em>비교 대상</em>으로 세운 것"이다. 문제는 그 비교 대상이 작동하지 않는다는 데 있다.</p>
+    <div class="stack-lg">
+
+      <article class="finding" data-sev="critical">
+        <header><span class="tier">치명적</span><h3><code>Rect</code>를 값으로 넘겨 OpenCV 추적 결과가 버려진다</h3></header>
+        <div class="prose">
+          <p>OpenCV의 <code>meanShift(InputArray, Rect&amp; window, TermCriteria)</code>는 두 번째 인자를 <strong>참조로 받아 갱신</strong>하는 것이 전부인 API다. 그런데 <code>Tracker::cvMeanShift</code>는 <code>Rect</code>를 값으로 선언했다. 갱신은 지역 복사본에서 끝나고 호출자의 <code>cvRect</code>는 <code>initilize</code>(<code>:28</code>)에서 설정된 최초 ROI에 영원히 고정된다.</p>
+          <p>즉 베이스라인은 매 프레임 같은 자리에서 다시 출발해 근처 모드로 수렴할 뿐, 상태를 이어받지 않는다. 추적이 아니라 매 프레임 독립 재검출이고, 목표가 최초 박스를 벗어나면 따라가지 못한다.</p>
+        </div>
+        <div class="ev">
+          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.h</b><span>:95–97 · 선언부터 값 전달</span></div>
+          <pre>		<span class="cm">// cv::meanshift</span>
+		void cvMeanShift(Mat&amp;, const Mat&amp;, <span class="hl">Rect</span>);
+		<span class="cm">// cv::camshift</span>
+		void cvCamShift(Mat&amp;, const Mat&amp;, <span class="hl">Rect</span>);</pre>
+        </div>
+        <div class="ev">
+          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.cc</b><span>:128, :329–332</span></div>
+          <pre><span class="cm">// :128  멤버 cvRect를 넘기지만 복사본이 만들어진다</span>
+			cvMeanShift(img, backproj, <span class="hl">cvRect</span>);
+
+<span class="cm">// :329  rc는 지역 복사본. meanShift가 갱신해도 호출자에게 돌아가지 않는다</span>
+void Tracker::cvMeanShift(Mat&amp; img, const Mat&amp; backproj, <span class="hl">Rect rc</span>)
+{
+	meanShift(backproj, rc, TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, param.max_itrs, 1));
+	rectangle(img, rc, Scalar(0, 0, 255), 3, CV_AA);
+}</pre>
+        </div>
+        <div class="prose">
+          <p>이 결함은 레포에 커밋된 증거로 직접 확인된다. <code>README.md:12</code>가 자랑스럽게 링크한 <code>TESTED/tested.gif</code>(726×442, 240프레임)에서 40번째와 90번째 프레임을 뽑아 보면, 초록 박스(<code>:116</code>, 자작)는 대상 물체를 따라 화면 중앙을 가로질러 이동하는데 <strong>빨간 박스(<code>:332</code>, OpenCV)는 왼쪽 하단 같은 자리에 머문 채 미세하게 떨기만 한다.</strong> 저자가 성공 데모라고 올린 파일이 베이스라인이 죽어 있다는 증거가 되어 있다.</p>
+        </div>
+      </article>
+
+      <article class="finding" data-sev="major">
+        <header><span class="tier">중대</span><h3>유일한 추적 실패 복구 로직이 도달 불가능한 데다, 도달해도 무효다</h3></header>
+        <div class="prose">
+          <p>프로젝트 전체에서 "대상을 잃었을 때"를 처리하는 코드는 <code>cvCamShift</code> 끝의 <code>:343–347</code>뿐이다. 박스가 1픽셀 이하로 쪼그라들면 탐색창을 다시 넓히는, 전형적인 CamShift 복구 패턴이다. 그런데 두 겹으로 죽어 있다.</p>
+          <p>첫째, 이 분기에 들어갈 방법이 없다. <code>cvMeanshift</code>는 <code>cv_tracker.h:82</code>에서 <code>true</code>로 하드코딩된 <code>protected</code> 멤버이고 setter도, 이를 바꾸는 UI도, 명령행 옵션도 없다. <code>:126</code>의 분기는 항상 <code>meanShift</code> 쪽으로만 간다. 둘째, 설령 들어가도 <code>rc</code>가 값 복사본이라 재조정 결과가 함수 밖으로 나가지 못한다.</p>
+        </div>
+        <div class="ev">
+          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.h</b><span>:81–82 · 및 cv_tracker.cc:343–347</span></div>
+          <pre>		<span class="cm">// if off, openCV method apply camshift;</span>
+		bool cvMeanshift = <span class="hl">true</span>;   <span class="cm">// ← setter 없음. 아래 전부 도달 불가</span>
+
+	if (rc.width &lt;= 1 || rc.height &lt;= 1)
+	{
+		int cols = backproj.cols, rows = backproj.rows, r = (MIN(cols, rows) + 5) / 6;
+		<span class="hl">rc</span> = Rect(rc.x - r, rc.y - r, rc.width + 2 * r, rc.height + 2 * r) &amp; Rect(0, 0, cols, rows);
+	}</pre>
+        </div>
+        <div class="prose">
+          <p>자작 경로에도 실패 감지가 없다. <code>mySimilarity</code>의 최대값을 무조건 받아들일 뿐, "이 정도로 안 닮았으면 놓친 것"이라는 임계값이 없다. 앞서 본 무조건 모델 갱신과 합쳐지면 한 번 빗나갔을 때 되돌아올 경로가 존재하지 않는다.</p>
+        </div>
+      </article>
+
+      <article class="finding" data-sev="major">
+        <header><span class="tier">중대</span><h3>역방향 드래그가 ROI 가드를 통과해 예외로 죽는다</h3></header>
+        <div class="prose">
+          <p>ROI는 <code>x - sPoint.x</code>, <code>y - sPoint.y</code>로 만들어지므로 오른쪽 아래→왼쪽 위로 끌면 width와 height가 <strong>둘 다 음수</strong>가 된다. 그리고 유효성 검사가 <code>rect.area() &gt; 100</code>이다. 음수 × 음수는 양수이므로 (200,200)→(100,100) 드래그는 넓이 10000으로 가드를 통과한다.</p>
+          <p>그대로 <code>tracker.initilize</code>로 들어가면 <code>cv_tracker.cc:264</code>의 <code>Mat target(hsv, rc);</code>가 음수 크기 ROI에 대해 <code>cv::Exception</code>을 던진다. <code>try/catch</code>가 없으므로 프로그램이 종료된다. 사용자가 박스를 반대 방향으로 그렸다는 것이 유일한 조건이다.</p>
+        </div>
+        <div class="ev">
+          <div class="ev-head"><b>imageProcessing/imageProcessing/main.cc</b><span>:94–98</span></div>
+          <pre>				p-&gt;rect = { p-&gt;sPoint.x, p-&gt;sPoint.y, <span class="hl">x - p-&gt;sPoint.x</span>, <span class="hl">y - p-&gt;sPoint.y</span> };
+				p-&gt;drag = false;
+				
+				if (<span class="hl">p-&gt;rect.area() &gt; 100</span>)   <span class="cm">// ← (-100)*(-100) = 10000 &gt; 100. 통과한다</span>
+					p-&gt;updated = true;</pre>
+        </div>
+      </article>
+
+      <article class="finding" data-sev="minor">
+        <header><span class="tier">경미</span><h3>컬러 모델 메뉴가 자작 추적기에는 아무 영향이 없다</h3></header>
+        <div class="prose">
+          <p><code>main.cc:60</code>이 HSV / RGB / hue / gray 네 가지를 물어보지만, 자작 경로는 <code>initilize</code>(<code>cv_tracker.cc:18</code>)와 <code>run</code>(<code>:39</code>) 모두 무조건 <code>CV_BGR2HSV</code>로 변환하고, <code>matrixAt</code>(<code>:195</code>)은 <code>channel_ratio</code> <code>{0.5, 0.25, 0.25}</code>(<code>cv_tracker.h:48</code>)로 세 채널을 고정 비율 합산한다. 선택은 OpenCV 경로의 <code>switch</code>에만 닿는다. 사용자에게 네 개의 선택지를 주면서 실제로는 하나만 구현된 셈이다.</p>
+          <p>입력 검증도 없다. <code>cin &gt;&gt; model</code> 뒤 <code>static_cast&lt;COLOR_MODEL&gt;(model - 1)</code>(<code>:65</code>)에 5를 넣으면 범위 밖 enum이 되어 <code>cvHistogram</code>의 <code>switch</code>가 아무 <code>case</code>도 타지 않고, <code>model3d</code>가 빈 채로 <code>calcBackProject</code>에 들어간다. 숫자가 아닌 입력이면 <code>model</code>이 0이 되어 <code>-1</code>이 된다.</p>
+        </div>
+      </article>
+
+      <article class="finding" data-sev="minor">
+        <header><span class="tier">경미</span><h3>첫 프레임 검사 누락과 의도적으로 주석 처리된 <code>delete</code></h3></header>
+        <div class="prose">
+          <p><code>main.cc:120</code>의 <code>*vc &gt;&gt; frame;</code> 직후 <code>imshow</code>를 호출하는데 <code>frame.empty()</code> 검사가 없다. 파일은 열리지만 첫 프레임 디코딩에 실패하는 경우(코덱 불일치 등) 그대로 예외다. 루프 안의 두 번째 읽기에는 <code>:139</code>에 검사가 있으므로 영상 종료 처리 자체는 되어 있다.</p>
+          <p><code>new VideoCapture</code>(<code>:50</code>)에 대응하는 <code>delete</code>는 <code>:66–67</code>에 주석으로 남아 있다. 프로세스 종료로 회수되긴 하지만, 지웠다가 문제가 생겨 되돌린 흔적으로 읽힌다. <code>cv_tracker.cc:94</code>의 <code>bRect = myRect = nRect;</code>에서 <code>bRect</code>로의 대입도 지역 변수의 마지막 쓰기라 죽은 코드다.</p>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ============ C. 문서와 확률론 ============ -->
+  <section>
+    <h2>C — 문서가 구현보다 앞서간 지점</h2>
+    <p class="prose"><code>docs/object_tracking.pptx</code> 18장을 텍스트 추출해 전부 읽었다. 발표자는 "배지운 이영수" 두 명으로 적혀 있고, 목차는 1. Set target object → 2. Back projection → 3. Mean shift process → 4. Updating → 5. Other functions → References로 이어진다. 구조 자체는 성실하고, 마지막 장이 "한양대학교 확률및통계 강의자료"를 출처로 밝힌 점도 정직하다.</p>
+    <div class="stack-lg">
+
+      <article class="finding" data-sev="major">
+        <header><span class="tier">중대</span><h3>13장의 "픽셀을 역투영 가중치로 mean shift 클러스터링"은 구현되지 않았다</h3></header>
+        <div class="prose">
+          <p>슬라이드 13의 문구는 <em>"Mean shift clustering of pixels with back projected weights"</em>다. 이것이 강의자료가 가르치는 정석이다 — 각 <strong>픽셀</strong>에 역투영 값을 가중치로 주고, 그 가중치로 중심을 옮긴다.</p>
+          <p>실제 <code>cv_tracker.cc:49–63</code>은 다르다. 성긴 격자 위의 <strong>후보 윈도</strong>들을 순회하며, 각 윈도 <em>전체</em>의 히스토그램을 새로 계산해 모델과의 유사도를 구하고, 그 값을 가중치로 윈도 좌표들의 가중평균을 낸다. 픽셀 단위 가중이 아니라 윈도 단위 가중이고, 커널 가중 밀도의 모드를 오르는 것이 아니라 샘플링된 후보 집합의 가중 중심을 구하는 것이다. 동작은 비슷해 보일 수 있으나 mean shift의 수렴 보장(밀도 상승 방향으로의 이동)이 성립하는 구조가 아니다.</p>
+          <p><code>:106–112</code>에 진짜 픽셀 단위 역투영이 있기는 하다. 다만 그것은 <code>MY_histogram</code> 창에 <strong>보여주기만</strong> 할 뿐, 위치 갱신에 쓰이지 않는다.</p>
+        </div>
+        <div class="ev">
+          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.cc</b><span>:52–55 · 픽셀이 아니라 윈도에 가중치를 준다</span></div>
+          <pre>					w = <span class="hl">mySimilarity</span>(hsv, Rect(temp.x + (temp.width / 2) + i, temp.y + (temp.height / 2) + j, nRect.width, nRect.height), this-&gt;objectHists);
+					tW += w;
+					nX += w * (temp.x + (temp.width / 2) + i);
+					nY += w * (temp.y + (temp.height / 2) + j);</pre>
+        </div>
+      </article>
+
+      <article class="finding" data-sev="minor">
+        <header><span class="tier">경미</span><h3>OpenCV 예제 헤더를 커밋해 두고 파생 클래스에는 본인만 표기했다</h3></header>
+        <div class="prose">
+          <p><code>example/tracker_opencv/code/tracker_opencv.h</code>는 <em>"Written by darkpgmr (http://darkpgmr.tistory.com), 2013"</em>이라고 명시된 제3자 코드다. 그리고 <code>cv_tracker.h</code>의 OpenCV 경로 설계는 이 헤더와 상당히 겹친다 — <code>init</code>/<code>run</code> 형태의 공개 API, <code>hist_bins</code>·<code>max_itrs</code>·<code>color_model</code>을 담은 파라미터 구조체, <code>CM_GRAY</code>/<code>CM_HUE</code>/<code>CM_RGB</code>/<code>CM_HSV</code> enum, <code>m_model</code>/<code>m_model3d</code>에 대응하는 <code>model</code>/<code>model3d</code> 보호 멤버까지.</p>
+          <p>참고 자료를 레포에 함께 남긴 것 자체는 오히려 투명한 행동이다. 다만 <code>cv_tracker.h:3–8</code>과 <code>main.cc:1–6</code>의 파일 헤더는 저자 본인의 GitHub 주소만 적고 있고, 발표자료 References 장에도 OpenCV 공식 문서와 강의자료만 있을 뿐 이 출처는 없다. 파생한 쪽에 한 줄 표기를 남기는 것이 맞다.</p>
+        </div>
+      </article>
+
+      <article class="finding" data-sev="minor">
+        <header><span class="tier">경미</span><h3>최상위 README가 구현에 대해 사실상 아무것도 말하지 않는다</h3></header>
+        <div class="prose">
+          <p><code>README.md</code>는 13줄이고 그중 실질 내용은 <em>"using OpenCV to test image processing[object tracking]"</em> 한 줄과 데모 GIF 링크뿐이다. 빌드 방법, OpenCV 버전, 필요한 Visual Studio 구성, 조작법(마우스로 ROI를 끌고 ESC로 종료), 알고리즘 요약이 전부 없다. 정작 그 정보의 일부는 소스 파일 상단 주석(<code>cv_tracker.h:10–18</code>)에만 들어 있다. 문서가 코드보다 앞서가지 않는 대신, 아예 따라오지 않은 경우다.</p>
+        </div>
+      </article>
+
+    </div>
+    <div class="note good" style="margin-top:22px">
+      <span class="lbl">잘한 것</span>
+      <p>발표자료 9장이 자기 유사도를 <em>"Modification version of Bhattacharyya distance"</em>라고 <strong>스스로 밝혀 적었다.</strong> 정석과 다르다는 것을 알고 있었고 그것을 숨기지 않았다는 뜻이다. 과제 문서에서 이 정도의 자기 고지는 드물고, 평가자 입장에서는 "몰랐다"와 "알고 바꿨다"의 차이가 크다. 다만 하필 그 변형이 확률분포 성질을 없애는 방향이었다는 것이 앞의 치명적 지적이다.</p>
+    </div>
+  </section>
+
+  <!-- ============ D. 위생과 이식성 ============ -->
+  <section>
+    <h2>D — 레포 위생과 이식성</h2>
+    <div class="stack-lg">
+
+      <article class="finding" data-sev="critical">
+        <header><span class="tier">치명적</span><h3>646줄짜리 과제를 위해 699MB를 커밋했다</h3></header>
+        <div class="prose">
+          <p>작업 트리 699MB, <code>.git</code> 160MB다. 원인은 <code>TESTED/</code>의 미디어가 아니다 — 그쪽은 mp4 두 개 약 11MB와 gif 4MB로 전체의 2%에 불과하다. 압도적인 주범은 <strong>OpenCV 3.0 SDK 전체를 x86/x64 × vc11/vc12 네 조합으로 통째 커밋한 것</strong>이다.</p>
+        </div>
+        <pre class="code"><span class="cm">// git 히스토리의 최대 blob (바이트)</span>
+59,990,716  imageProcessing/example/VTD_data_videos/animal.avi
+53,742,592  imageProcessing/imageProcessing/lib/x64/vc11/bin/opencv_world300d.dll
+52,001,280  imageProcessing/imageProcessing/lib/x64/vc12/bin/opencv_world300d.dll
+41,171,456  imageProcessing/imageProcessing/lib/x86/vc11/bin/opencv_world300d.dll
+40,094,208  imageProcessing/imageProcessing/lib/x86/vc12/bin/opencv_world300d.dll
+33,503,744  imageProcessing/imageProcessing/lib/x64/vc11/bin/opencv_world300.dll
+   ... opencv_world300*.dll 8개 합계 약 310MB, opencv_ts300*.lib 8개 합계 약 99MB
+ 7,383,466  imageProcessing/Debug/test.jpg   <span class="cm">// f93ca0a에서 커밋, 15b985e에서 삭제 — 히스토리에는 영구히 남음</span></pre>
+        <div class="prose">
+          <p>덧붙일 점 셋. 첫째, 실제로 빌드에 쓰인 구성은 <code>Debug|Win32</code> 하나(<code>imageProcessing.vcxproj:92,97</code>, <code>opencv_world300d.lib</code>)이므로 나머지 세 조합의 라이브러리는 한 번도 쓰이지 않았다. 둘째, <code>example/.gitignore</code>가 <code>VTD_data_videos/</code>, <code>tracker_opencv/</code> 등을 나열하고 있지만 그 파일들은 이미 커밋된 뒤라(<code>901de66</code>, <code>295122a</code>) 아무 효과가 없다. 셋째, 당시 Visual Studio 프로젝트에서 SDK를 동봉하는 것이 드문 관행은 아니었으나, 그렇다고 60MB짜리 샘플 영상 <code>animal.avi</code>까지 함께 넣을 이유는 없었다.</p>
+        </div>
+      </article>
+
+      <article class="finding" data-sev="major">
+        <header><span class="tier">중대</span><h3>제3자 바이너리를 재배포하면서 라이선스 표기가 없다</h3></header>
+        <div class="prose">
+          <p><code>find</code>로 확인한 결과 레포 전체에 <code>LICENSE</code>, <code>COPYING</code>, <code>NOTICE</code> 류 파일이 <strong>하나도 없다.</strong> OpenCV는 3-clause BSD이고, 그 조항은 바이너리 형태로 재배포할 때 저작권 고지와 조건문을 동봉할 것을 요구한다. 지금 레포에서 BSD 전문이 존재하는 곳은 벤더링된 헤더 파일 내부 주석뿐이며(<code>include/opencv/cv.h</code> 등), <code>lib/</code> 아래 DLL·LIB 8쌍에 대응하는 고지는 없다. 저자 자신의 코드에 대한 라이선스도 명시되지 않아 재사용 조건이 불분명하다.</p>
+        </div>
+      </article>
+
+      <article class="finding" data-sev="minor">
+        <header><span class="tier">경미</span><h3>Windows 전용 구속과 빌드조차 되지 않는 x64 구성</h3></header>
+        <div class="prose">
+          <p>macOS에서는 빌드가 불가능하며 그 사실은 명확히 기록해 둔다 — <code>main.cc:20</code>이 <code>&lt;Windows.h&gt;</code>를 포함하고, 파일 선택 대화상자가 <code>OPENFILENAME</code>과 <code>::GetOpenFileName</code>(<code>main.cc:165–180</code>)으로 구현되어 있으며, <code>cv_tracker.h:23–26</code>의 include 경로가 역슬래시(<code>"opencv2\core\core.hpp"</code>)다. C++ 표준에서 역슬래시가 든 헤더명은 구현 정의 동작이고 POSIX 툴체인에서는 그대로 깨진다. 프로젝트도 <code>PlatformToolset v140</code>, <code>WindowsTargetPlatformVersion 8.1</code>에 묶여 있다. 따라서 아래 모든 판정은 빌드가 아니라 정독과 산술 포팅 시뮬레이션에 근거한다.</p>
+          <p>그와 별개로 <code>Debug|x64</code> 구성은 Windows에서도 빌드되지 않았을 것이다. include 경로가 드라이브 루트 기준 <code>\include</code>이고 라이브러리 경로가 <code>\lib\x86\vc12\lib</code>, 즉 x64 구성이 <strong>x86 라이브러리</strong>를 루트 절대경로로 가리킨다. 다른 세 구성이 쓰는 프로젝트 상대경로 <code>.\include</code>와 대조된다.</p>
+        </div>
+        <div class="ev">
+          <div class="ev-head"><b>imageProcessing/imageProcessing/imageProcessing.vcxproj</b><span>:101, 109, 114</span></div>
+          <pre>  &lt;ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='<span class="hl">Debug|x64</span>'"&gt;
+      &lt;AdditionalIncludeDirectories&gt;<span class="hl">\include</span>;%(AdditionalIncludeDirectories)&lt;/AdditionalIncludeDirectories&gt;
+      &lt;AdditionalLibraryDirectories&gt;<span class="hl">\lib\x86\vc12\lib</span>;%(AdditionalLibraryDirectories)&lt;/AdditionalLibraryDirectories&gt;</pre>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ============ 반복 패턴 ============ -->
+  <section>
+    <h2>반복되는 패턴</h2>
+    <ol class="rank">
+      <li><div><strong>기본값에서만 우연히 맞는 코드.</strong> <code>myHistogramValue</code>의 인덱스는 <code>hist_bins</code>가 정확히 16일 때만 맞고(<code>:201</code> vs <code>:152</code>), 화면에 그려지는 박스는 자동조정 단계가 mean shift 결과를 덮어써 준 덕분에만 제자리에 있다(<code>:83</code>). 우연한 정합에 기대는 코드는 파라미터 하나를 바꾸는 순간 무너진다.</div></li>
+      <li><div><strong>추가 기능이 본 알고리즘을 가린다.</strong> 헤더 주석(<code>cv_tracker.h:6–8</code>)이 내건 세 가지 부가기능 중 "dynamic search range"는 탐색 반경이 단조 감소해 첫 프레임에 하한에 붙어 무력화되고, "model histogram update"는 그 결과 가드가 항상 열려 무조건 갱신이 되며, "autosizing"은 위치 결정권까지 가져가 버렸다. 셋 다 본체를 다듬은 것이 아니라 본체 위에 덧댄 결과 본체를 대체했다.</div></li>
+      <li><div><strong>참조로 넘겨야 할 것을 값으로 넘긴다.</strong> <code>cvMeanShift</code>와 <code>cvCamShift</code>의 <code>Rect</code>(<code>cv_tracker.h:95–97</code>)가 그렇고, 그 하나로 베이스라인 추적과 실패 복구가 동시에 죽었다. C++ 값 의미론에 대한 이해가 아직 안 잡혀 있던 시점의 코드로 읽힌다.</div></li>
+      <li><div><strong>할당은 하고 해제는 하지 않는다.</strong> <code>myHistogram</code>의 <code>calloc</code>은 대응하는 <code>free</code>가 레포에 0건, <code>new VideoCapture</code>의 <code>delete</code>는 주석 처리(<code>main.cc:67</code>), 소멸자는 비어 있다(<code>cv_tracker.cc:8</code>). 데모 길이가 짧아 드러나지 않았을 뿐이다.</div></li>
+      <li><div><strong>사용자 입력을 신뢰한다.</strong> 컬러 모델 번호는 범위 검사 없이 enum으로 캐스팅되고(<code>main.cc:61,65</code>), ROI는 <code>area() &gt; 100</code>이라는 부호를 놓친 가드 하나만 통과하면 된다(<code>main.cc:97</code>). 둘 다 예외로 직행한다.</div></li>
+    </ol>
+  </section>
+
+  <!-- ============ 권고 ============ -->
+  <section>
+    <h2>지금 손본다면</h2>
+    <ol class="rank">
+      <li><div><strong><code>cv_tracker.h:95–97</code>의 <code>Rect</code>를 <code>Rect&amp;</code>로 바꾼다.</strong> 문자 두 개. 이것만으로 OpenCV 베이스라인이 실제 추적기가 되고 비교 실험이 성립하며, CamShift 복구 로직도 살아난다. 투자 대비 효과가 이 레포에서 가장 크다.</div></li>
+      <li><div><strong>좌표 규약을 하나로 통일한다.</strong> <code>:52</code>를 중심 기준으로 고칠지 <code>:71</code>의 <code>- width/2</code>를 뺄지 정하고, <code>:79</code>를 그에 맞춘다. 그러면 mean shift 루프의 출력이 실제로 쓰이게 되고, 정지 화면에서 박스가 흘러가는 현상이 사라진다.</div></li>
+      <li><div><strong>정규화를 L1로, 유사도를 <code>sqrt</code>로 바꾼다.</strong> <code>:161</code>을 <code>total += hists[i]</code>로, <code>:145</code>를 <code>similarity += sqrt(hists[i] * nHists[i])</code>로. 각각 한 줄이며, 그 순간 유사도가 Bhattacharyya 계수가 되어 값이 [0,1]에 갇힌다. 부수 효과로 <code>:69</code>의 <code>twRatio</code> 스케일이 예측 가능해지고 "이 값 이하면 놓친 것"이라는 실패 임계값을 정의할 수 있게 된다. 과목 관점에서 가장 중요한 수정이다.</div></li>
+      <li><div><strong>자작 루프에 <code>max_itrs</code>를 건다.</strong> 이미 선언되어 있고(<code>cv_tracker.h:56</code>) OpenCV 경로에서만 쓰이고 있으니, <code>:42</code>의 <code>do</code>에 반복 카운터를 붙이면 끝이다. 수렴 임계값은 루프 밖에서 고정한 별도 상수를 쓴다.</div></li>
+      <li><div><strong><code>myHistogram</code>을 <code>std::vector&lt;double&gt;</code> 반환으로 바꾼다.</strong> <code>calloc</code>/누락된 <code>free</code> 문제가 통째로 사라지고 호출부는 그대로다. 여유가 있으면 후보마다 전체 히스토그램을 다시 세는 대신 적분 히스토그램을 쓰면 프레임당 수십만 번의 픽셀 접근이 줄어든다.</div></li>
+      <li><div><strong>ROI를 <code>Rect(sPoint, Point(x,y))</code>로 만든다.</strong> OpenCV의 두 점 생성자가 좌표를 정규화하므로 음수 크기 자체가 나오지 않는다. <code>main.cc:97</code>의 넓이 가드는 그대로 둬도 된다.</div></li>
+      <li><div><strong><code>git filter-repo</code>로 <code>lib/</code>·<code>example/VTD_data_videos/</code>·<code>Debug/</code>를 히스토리에서 들어내고 <code>LICENSE</code>를 추가한다.</strong> 699MB가 1MB 아래로 떨어진다. OpenCV는 NuGet이나 CMake <code>find_package</code>로 받게 하고, 파생한 <code>cv_tracker.h</code>에 darkpgmr 출처 한 줄을 남긴다.</div></li>
+    </ol>
+  </section>
+
+  <footer>
+    <p>평가 대상: <code>github.com/jiunbae/MAT4015</code> · 커밋 32개(2016-04-10 ~ 2016-06-23, 이후 2021-08-09 GitHub 계정명 변경 커밋 1건) · 브랜치는 <code>master</code> 단일 · 저자 코드 646줄(<code>cv_tracker.cc</code> 348 + <code>main.cc</code> 180 + <code>cv_tracker.h</code> 118), 별도로 <code>example/open.c</code> 355줄</p>
+    <p>검증 방식: <strong>빌드하지 않았다.</strong> Visual Studio 솔루션에 <code>&lt;Windows.h&gt;</code>·<code>GetOpenFileName</code>·역슬래시 include 경로 의존이 있어 macOS에서 컴파일이 불가능하다. 대신 (1) 저자 코드 646줄과 <code>example/open.c</code> 355줄 전체 정독, (2) <code>cv_tracker.cc:42–91</code>의 산술을 Python으로 그대로 포팅해 합성 프레임에서 20프레임 실행 — 보고서의 좌표 어긋남·정지 화면 드리프트·<code>search_range</code> 하한 고착 수치는 모두 그 실행 결과, (3) 인덱스 상한 계산으로 <code>hist_bins≠16</code>에서의 배열 밖 접근 확인, (4) <code>docs/object_tracking.pptx</code> 18장 및 두 강의자료 PDF(46쪽·39쪽) 텍스트 추출, (5) <code>TESTED/tested.gif</code> 240프레임 중 40·90번 프레임을 <code>ffmpeg</code>으로 추출해 육안 확인 — 빨간 박스 고착의 근거, (6) <code>git rev-list --objects</code>로 전체 blob 크기 집계. 모든 인용은 실제 파일과 행 번호를 <code>grep -n</code>으로 대조했다.</p>
+  </footer>
+
+</div>
