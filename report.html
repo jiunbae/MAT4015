@@ -1,8 +1,15 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MAT4015 응용확률및랜덤프로세스</title>
+<meta name="description" content="MAT4015 응용확률및랜덤프로세스 코드 감사 보고서 — 근거 기반 평가와 등급">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
+
 :root{
   --ground:#F3F4F1; --surface:#FCFCFA; --surface-2:#EDEFEA;
   --ink:#1A211C; --ink-soft:#5F6862; --ink-faint:#8A938C;
@@ -146,8 +153,108 @@ footer p + p{margin-top:6px}
   .grade{transform:none}
   .masthead{padding-block:30px 18px}
 }
-</style>
 
+/* ---------- index-only components ---------- */
+.thesis{font-family:var(--f-display); font-size:clamp(19px,2.9vw,24px); line-height:1.45; max-width:34ch}
+.dist{display:flex; height:34px; border-radius:3px; overflow:hidden; border:1px solid var(--rule); margin-top:10px}
+.dist span{display:flex; align-items:center; justify-content:center; overflow:hidden; white-space:nowrap; font-family:var(--f-mono); font-size:11px; font-weight:600; color:var(--surface)}
+@media (max-width:560px){ .dist span{font-size:0} .dist{height:22px} }
+.dist .d-hi{background:var(--good)} .dist .d-mid{background:var(--warn)} .dist .d-lo{background:var(--mark)} .dist .d-na{background:var(--ink-faint)}
+.legend{display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:10px; font-size:13px; color:var(--ink-soft)}
+.legend i{display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:6px; vertical-align:baseline}
+.yr{font-family:var(--f-mono); font-size:11px; font-weight:600; letter-spacing:.16em; color:var(--ink-faint); text-transform:uppercase;
+    padding-top:22px; margin-top:8px; border-top:1px solid var(--rule)}
+.yr:first-of-type{border-top:0; padding-top:0}
+.row{display:grid; grid-template-columns:auto 1fr auto; gap:4px 16px; align-items:baseline;
+     padding:14px 0; border-bottom:1px solid var(--rule-soft)}
+.row:last-child{border-bottom:0}
+.row .rc{font-family:var(--f-mono); font-size:12px; font-weight:600; color:var(--accent); letter-spacing:.06em; white-space:nowrap}
+.row .rn{font-family:var(--f-display); font-size:18px; font-weight:600}
+.row .rg{font-family:var(--f-display); font-size:20px; font-weight:600; white-space:nowrap; justify-self:end}
+.row .rv{grid-column:2/4; color:var(--ink-soft); font-size:14.5px; max-width:68ch}
+.row a{text-decoration:none}
+.row a:hover .rn{text-decoration:underline}
+@media (max-width:560px){
+  .row{grid-template-columns:1fr auto}
+  .row .rc{grid-column:1/3}
+  .row .rv{grid-column:1/3}
+}
+.two{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; margin-top:22px}
+.act{background:var(--surface); border:1px solid var(--rule); border-left:4px solid var(--mark); border-radius:3px; padding:16px 18px; box-shadow:var(--shadow)}
+.act h4{font-size:16px; margin-bottom:6px}
+.act p{font-size:14px; color:var(--ink-soft)}
+.act.ok{border-left-color:var(--good)}
+
+
+/* ---------- prompt disclosure ---------- */
+details.prompt{margin-top:22px; border:1px solid var(--rule); border-radius:3px; background:var(--surface)}
+details.prompt > summary{cursor:pointer; padding:11px 16px; font-family:var(--f-mono); font-size:11.5px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); list-style:none}
+details.prompt > summary::-webkit-details-marker{display:none}
+details.prompt > summary::before{content:"▸ "; color:var(--accent)}
+details.prompt[open] > summary::before{content:"▾ "}
+details.prompt > summary:hover{color:var(--accent)}
+.prompt-body{padding:0 16px 16px; border-top:1px solid var(--rule-soft)}
+.prompt-body p{font-size:13.5px; color:var(--ink-soft); margin:12px 0 0}
+.prompt-body pre{white-space:pre-wrap; word-break:break-word; font-size:12px; line-height:1.7}
+.sitenav .meth{margin-left:auto; color:var(--ink-soft); text-decoration:none}
+.sitenav .meth + .ext{margin-left:0}
+
+/* ---------- findings summary strip ---------- */
+.summary{display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px; margin:-18px 0 0; padding:12px 0 0}
+.summary .lbl{margin-right:2px}
+.summary .chip{display:inline-flex; align-items:baseline; gap:5px; padding:3px 10px; border-radius:2px;
+  font-family:var(--f-mono); font-size:11px; letter-spacing:.06em; text-decoration:none; border:1px solid transparent}
+.summary .chip b{font-family:var(--f-display); font-size:15px; font-weight:600}
+.summary .s-critical{color:var(--mark); background:var(--mark-soft); border-color:var(--mark)}
+.summary .s-major{color:var(--warn); background:var(--warn-soft); border-color:var(--warn)}
+.summary .s-minor{color:var(--ink-soft); background:var(--surface-2); border-color:var(--rule)}
+.summary .chip:hover{filter:brightness(.96)}
+.summary .total{font-family:var(--f-mono); font-size:11px; color:var(--ink-faint); letter-spacing:.08em}
+.permalink{margin-left:auto; color:var(--ink-faint); text-decoration:none; font-family:var(--f-mono);
+  font-size:14px; opacity:0; transition:opacity .12s}
+.finding:hover .permalink, .permalink:focus{opacity:1}
+.finding:target{outline:2px solid var(--accent); outline-offset:4px}
+@media (prefers-reduced-motion:reduce){.permalink{transition:none}}
+/* ================= site chrome (Pages only) ================= */
+.sitenav{position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:14px;
+  padding:10px 20px; background:color-mix(in srgb, var(--ground) 88%, transparent);
+  backdrop-filter:saturate(150%) blur(8px); border-bottom:1px solid var(--rule);
+  font-family:var(--f-mono); font-size:12px}
+.sitenav .home{color:var(--accent); font-weight:600; text-decoration:none; letter-spacing:.04em}
+.sitenav .crumb{color:var(--ink-faint); letter-spacing:.14em}
+.sitenav .ext{margin-left:auto; color:var(--ink-soft); text-decoration:none}
+.sitenav a:hover{text-decoration:underline}
+.ev-head .src{color:inherit; text-decoration:none; border-bottom:1px dotted var(--ink-faint)}
+.ev-head .src:hover{color:var(--accent); border-bottom-color:var(--accent)}
+.ev-head .expand{margin-left:auto; font-family:var(--f-mono); font-size:10.5px; letter-spacing:.08em;
+  color:var(--ink-soft); background:transparent; border:1px solid var(--rule);
+  border-radius:2px; padding:2px 7px; cursor:pointer}
+.ev-head .expand:hover{color:var(--accent); border-color:var(--accent)}
+.ev-more{border-top:1px solid var(--rule-soft); background:var(--surface); max-height:420px; overflow:auto}
+.ev-more pre{margin:0; padding:12px 14px; font-family:var(--f-mono); font-size:12px; line-height:1.6}
+.ev-more .ln{display:inline-block; width:3.6em; color:var(--ink-faint); user-select:none; text-align:right; padding-right:1em}
+.ev-more mark{background:var(--mark-soft); color:var(--ink); display:inline-block; width:100%}
+.ev-more .err{padding:12px 14px; color:var(--mark); font-family:var(--f-mono); font-size:12px}
+/* filters */
+.filters{display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; align-items:center}
+.filters button{font-family:var(--f-mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  padding:5px 11px; border:1px solid var(--rule); background:var(--surface); color:var(--ink-soft);
+  border-radius:2px; cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--accent); color:var(--surface); border-color:var(--accent)}
+.filters .lbl{margin-right:2px}
+.finding[hidden]{display:none!important}
+@media print{.sitenav,.filters,.expand{display:none}}
+
+</style>
+</head>
+<body>
+<nav class="sitenav">
+  <a class="home" href="https://cse.jiun.dev/">CS 커리큘럼 감사</a>
+  <span class="crumb">MAT4015</span>
+  <a class="meth" href="https://cse.jiun.dev/method.html">방법</a>
+  <a class="ext" href="https://github.com/jiunbae/MAT4015" target="_blank" rel="noopener">저장소 &#8599;</a>
+</nav>
 <div class="wrap">
 
   <!-- ============ MASTHEAD ============ -->
@@ -166,6 +273,8 @@ footer p + p{margin-top:6px}
       <div class="grade"><b>C</b><span class="lbl">종합</span></div>
     </div>
   </header>
+  <div class="note" style="margin:0 0 28px"><span class="lbl">오프라인 사본</span><p>이 파일은 저장소에 함께 두는 사본이다. 원본은 <a href="https://cse.jiun.dev/reviews/MAT4015.html">cse.jiun.dev</a>에 있고, 그쪽에서는 인용된 줄의 원본 코드를 그 자리에서 펼쳐 볼 수 있다.</p></div>
+  <div class="summary" role="group" aria-label="소견 요약"><span class="lbl">소견</span><a class="chip s-critical" href="#f01"><b>4</b> 치명적</a><a class="chip s-major" href="#f01"><b>6</b> 중대</a><a class="chip s-minor" href="#f01"><b>8</b> 경미</a><span class="total">합계 18</span></div>
 
   <!-- ============ 총평 ============ -->
   <section>
@@ -201,16 +310,14 @@ footer p + p{margin-top:6px}
     <p class="prose">평가 대상 코드는 <code>cv_tracker.cc</code> 348줄, <code>main.cc</code> 180줄, <code>cv_tracker.h</code> 118줄로 합계 646줄이다. 레포의 C/C++ 총합 81,973줄 중 나머지 약 81,000줄은 벤더링된 OpenCV 헤더(<code>include/opencv2/</code>, <code>include/opencv/</code>)이므로 저자 작업량이 아니다. 그 646줄 중 자작 추적기는 <code>Tracker::run</code>의 첫 블록(<code>cv_tracker.cc:35–117</code>)과 <code>myHistogram</code> / <code>mySimilarity</code> / <code>matrixAt</code>에 해당한다.</p>
     <div class="stack-lg">
 
-      <article class="finding" data-sev="critical">
-        <header><span class="tier">치명적</span><h3>히스토그램이 확률분포가 아니고, 유사도가 Bhattacharyya 계수가 아니다</h3></header>
+      <article class="finding" id="f01" data-sev="critical">
+        <header><span class="tier">치명적</span><h3>히스토그램이 확률분포가 아니고, 유사도가 Bhattacharyya 계수가 아니다</h3><a class="permalink" href="#f01" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p>정규화가 <code>total += hists[i] * hists[i]</code> 후 <code>sqrt</code>, 즉 L2 노름이다. 이렇게 나누면 Σp<sub>i</sub> = 1이 성립하지 않으므로 결과는 확률질량함수가 아니라 단위벡터다. 이어서 유사도는 <code>hists[i] * nHists[i]</code>의 합, 곧 두 단위벡터의 내적(코사인 유사도)이다.</p>
           <p>강의자료가 다루는 Bhattacharyya 계수는 ρ(p,q) = Σ√(p<sub>i</sub>q<sub>i</sub>)이고, 이 값이 [0,1]에 갇히고 √(1−ρ)가 거리가 되는 근거는 p와 q가 <strong>확률분포라는 데서</strong> 나온다. 제곱근을 빼고 L1 정규화를 L2로 바꾸면 그 근거가 둘 다 사라진다. 남는 것은 추적에 쓸 수는 있지만 확률론적 해석이 없는 벡터 내적이다.</p>
           <p>결정적인 대조는 같은 레포 안에 있다. <code>example/open.c</code>는 정석 형태를 그대로 갖고 있다.</p>
         </div>
-        <div class="ev">
-          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.cc</b><span>:159–164, 144–145</span></div>
-          <pre>	<span class="cm">// myHistogram — L1이 아니라 L2로 정규화</span>
+        <div class="ev" data-linked="1"><div class="ev-head"><a class="src" href="https://github.com/jiunbae/MAT4015/blob/HEAD/imageProcessing/imageProcessing/cv_tracker.cc#L159-L164" target="_blank" rel="noopener"><b>imageProcessing/imageProcessing/cv_tracker.cc</b></a><span>:159–164, 144–145</span><button class="expand" type="button" data-repo="MAT4015" data-path="imageProcessing/imageProcessing/cv_tracker.cc" data-start="159" data-end="164">전체 맥락</button></div><pre>	<span class="cm">// myHistogram — L1이 아니라 L2로 정규화</span>
 	double total = 0;
 	for (int i = 0; i &lt; param.hist_bins; ++i)
 		<span class="hl">total += hists[i] * hists[i];</span>
@@ -220,37 +327,30 @@ footer p + p{margin-top:6px}
 
 	<span class="cm">// mySimilarity — 제곱근 없는 내적</span>
 	for (int i = 0; i &lt; param.hist_bins; ++i)
-		<span class="hl">similarity += hists[i] * nHists[i];</span></pre>
-        </div>
-        <div class="ev">
-          <div class="ev-head"><b>imageProcessing/example/open.c</b><span>:351–354 · 같은 레포의 정석 구현</span></div>
-          <pre>	for (int i = 0; i &lt; 16; i++)
+		<span class="hl">similarity += hists[i] * nHists[i];</span></pre></div>
+        <div class="ev" data-linked="1"><div class="ev-head"><a class="src" href="https://github.com/jiunbae/MAT4015/blob/HEAD/imageProcessing/example/open.c#L351-L354" target="_blank" rel="noopener"><b>imageProcessing/example/open.c</b></a><span>:351–354 · 같은 레포의 정석 구현</span><button class="expand" type="button" data-repo="MAT4015" data-path="imageProcessing/example/open.c" data-start="351" data-end="354">전체 맥락</button></div><pre>	for (int i = 0; i &lt; 16; i++)
 	{
 		<span class="hl">w += sqrt(histogram[i] * next_frame_histogram[i]);</span>
-	}</pre>
-        </div>
+	}</pre></div>
         <div class="prose">
           <p>더불어 커널 프로파일이 없다. 코드 전체에 Epanechnikov도 Gaussian도, 중심에서 멀어질수록 가중치를 줄이는 어떤 공간 가중도 존재하지 않는다. Comaniciu &amp; Meer의 mean shift 벡터가 커널 미분에서 유도된다는 점을 생각하면, 이것은 구현 세부의 누락이 아니라 방법의 토대가 빠진 것이다.</p>
         </div>
       </article>
 
-      <article class="finding" data-sev="critical">
-        <header><span class="tier">치명적</span><h3>좌표 규약이 두 곳에서 엇갈려, mean shift 루프의 결과가 버려진다</h3></header>
+      <article class="finding" id="f02" data-sev="critical">
+        <header><span class="tier">치명적</span><h3>좌표 규약이 두 곳에서 엇갈려, mean shift 루프의 결과가 버려진다</h3><a class="permalink" href="#f02" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p>후보 윈도를 만드는 <code>:52</code>는 <code>Rect(x, y, w, h)</code>의 첫 두 인자, 즉 <strong>좌상단</strong> 자리에 <code>temp.x + temp.width/2</code>를 넣는다. 그런데 이 값은 계산해 보면 <code>nRect.x + nRect.width/2</code>, 곧 객체의 <strong>중심</strong>이다. 따라서 <code>nX</code>는 "좌상단 좌표들의 가중평균"이 된다.</p>
           <p>루프를 닫는 <code>:71</code>은 그 <code>nX</code>를 <strong>중심으로 보고</strong> <code>nX - width/2</code>를 한다. 반면 루프 직후 박스 크기를 고르는 <code>:79</code>는 같은 <code>nX</code>를 <strong>좌상단으로 보고</strong> 그대로 쓴다. 둘 중 하나만 맞을 수 있다.</p>
         </div>
-        <div class="ev">
-          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.cc</b><span>:52 / :71 / :79</span></div>
-          <pre><span class="cm">// :52  중심 좌표를 Rect의 "좌상단" 자리에 넣는다</span>
+        <div class="ev" data-linked="1"><div class="ev-head"><a class="src" href="https://github.com/jiunbae/MAT4015/blob/HEAD/imageProcessing/imageProcessing/cv_tracker.cc#L52" target="_blank" rel="noopener"><b>imageProcessing/imageProcessing/cv_tracker.cc</b></a><span>:52 / :71 / :79</span><button class="expand" type="button" data-repo="MAT4015" data-path="imageProcessing/imageProcessing/cv_tracker.cc" data-start="52" data-end="52">전체 맥락</button></div><pre><span class="cm">// :52  중심 좌표를 Rect의 "좌상단" 자리에 넣는다</span>
 w = mySimilarity(hsv, Rect(<span class="hl">temp.x + (temp.width / 2) + i</span>, temp.y + (temp.height / 2) + j, nRect.width, nRect.height), this-&gt;objectHists);
 
 <span class="cm">// :71  nX를 "중심"으로 간주해 절반을 뺀다</span>
 nRect = Rect(max(<span class="hl">(int)nX - nRect.width / 2</span>, 0), max((int)nY - nRect.height / 2, 0), myRect.width, myRect.height);
 
 <span class="cm">// :79  같은 nX를 이번엔 "좌상단"으로 쓴다 — 위와 모순</span>
-w = mySimilarity(hsv, temp = Rect(<span class="hl">nX, nY</span>, i, j), this-&gt;objectHists);</pre>
-        </div>
+w = mySimilarity(hsv, temp = Rect(<span class="hl">nX, nY</span>, i, j), this-&gt;objectHists);</pre></div>
         <div class="prose">
           <p>결과를 확인하려고 <code>:42–91</code>의 산술을 그대로 Python으로 옮겨 합성 프레임(320×240, 객체 <code>(100,80,60,50)</code>)에서 돌렸다. 정지 화면에 정답 위치로 초기화했으므로 올바른 추적기라면 영원히 <code>(100,80)</code>에 머물러야 한다.</p>
         </div>
@@ -268,69 +368,57 @@ frame 20: ...                                   그려진 박스        = (106, 
         </div>
       </article>
 
-      <article class="finding" data-sev="major">
-        <header><span class="tier">중대</span><h3>반복 상한이 없고, 수렴 판정 기준을 루프 안에서 스스로 줄인다</h3></header>
+      <article class="finding" id="f03" data-sev="major">
+        <header><span class="tier">중대</span><h3>반복 상한이 없고, 수렴 판정 기준을 루프 안에서 스스로 줄인다</h3><a class="permalink" href="#f03" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p><code>TrackerParam::max_itrs = 32</code>(<code>cv_tracker.h:56</code>)은 정의돼 있지만, 코드 전체에서 이 값을 읽는 곳은 <code>:331</code>과 <code>:339</code>, 즉 OpenCV <code>TermCriteria</code>뿐이다. 자작 루프에는 반복 상한이 없다.</p>
           <p>대신 종료 조건은 이동거리가 <code>param.search_range</code> 이하가 되는 것인데, 그 <code>search_range</code>를 루프 <strong>안에서</strong> <code>:69</code>가 매 반복 줄인다. 새 계수는 <code>twRatio &gt; 0.25</code>이면 <code>1 - twRatio</code>(최대 0.75), 아니면 <code>0.75 + twRatio</code>(최대 1.0)이다. <strong>어느 쪽이든 1을 넘지 못하므로 탐색 반경은 단조 감소한다.</strong> 매 반복 임계값이 좁아지는 종료 조건이라 수렴 보장이 없다.</p>
         </div>
-        <div class="ev">
-          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.cc</b><span>:69, :72, :91</span></div>
-          <pre><span class="cm">// :69  계수가 절대 1을 넘지 않는다 → 탐색 반경 단조 감소</span>
+        <div class="ev" data-linked="1"><div class="ev-head"><a class="src" href="https://github.com/jiunbae/MAT4015/blob/HEAD/imageProcessing/imageProcessing/cv_tracker.cc#L69" target="_blank" rel="noopener"><b>imageProcessing/imageProcessing/cv_tracker.cc</b></a><span>:69, :72, :91</span><button class="expand" type="button" data-repo="MAT4015" data-path="imageProcessing/imageProcessing/cv_tracker.cc" data-start="69" data-end="69">전체 맥락</button></div><pre><span class="cm">// :69  계수가 절대 1을 넘지 않는다 → 탐색 반경 단조 감소</span>
 param.search_range *= (twRatio &gt; (EXTEND_LIMIT) ? <span class="hl">1 - twRatio</span> : <span class="hl">(1 - EXTEND_LIMIT) +twRatio</span>);
 <span class="cm">// :72  그 줄어든 값이 곧 수렴 임계값</span>
 } while (sqrt(pow(myRect.x - nRect.x, 2) + pow(myRect.y - nRect.y, 2)) <span class="hl">&gt; param.search_range</span>);
 <span class="cm">// :91  하한 클램프는 루프가 끝난 뒤에야 걸린다</span>
-param.search_range = min(max(param.search_range, SEARCH_MIN), SEARCH_MAX);</pre>
-        </div>
+param.search_range = min(max(param.search_range, SEARCH_MIN), SEARCH_MAX);</pre></div>
         <div class="prose">
           <p>하한 <code>SEARCH_MIN = 4</code>는 <code>:91</code>, 즉 루프를 빠져나온 뒤에만 적용된다. 루프 안에서는 반경이 0에 임의로 가까워질 수 있다. 위 시뮬레이션에서 <code>search_range</code>는 1프레임 만에 하한 4.0에 붙어 그 뒤로 움직이지 않았고, 이는 헤더가 내건 "dynamic search range"(<code>cv_tracker.h:6</code>)가 사실상 무력화되었다는 뜻이다.</p>
           <p>더 나쁜 잠재 위험이 <code>:48</code>에 있다. <code>temp.width / param.sampling</code>은 양쪽이 <code>int</code>이므로 정수 나눗셈이고, <code>temp.width &lt; 8</code>이면 보폭이 0이 된다. 그러면 <code>:49</code>의 <code>i += sRatioWidth</code>가 영원히 전진하지 않는다. <code>main.cc:97</code>의 ROI 가드가 넓이만 보므로 4×30 같은 가늘고 긴 박스(넓이 120)면 이 경로에 들어갈 수 있다.</p>
         </div>
       </article>
 
-      <article class="finding" data-sev="major">
-        <header><span class="tier">중대</span><h3>후보 하나마다 <code>calloc</code>, 그리고 <code>free</code>는 레포 어디에도 없다</h3></header>
+      <article class="finding" id="f04" data-sev="major">
+        <header><span class="tier">중대</span><h3>후보 하나마다 <code>calloc</code>, 그리고 <code>free</code>는 레포 어디에도 없다</h3><a class="permalink" href="#f04" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p><code>myHistogram</code>은 호출될 때마다 <code>calloc</code>으로 새 배열을 할당해 반환한다. 이것을 매 후보 윈도마다 호출하는 것이 <code>mySimilarity</code>다. <code>grep</code>으로 확인한 결과 <code>cv_tracker.cc</code>와 <code>main.cc</code>를 통틀어 <code>free()</code> 호출은 <strong>0건</strong>이고, 유일한 <code>delete</code>는 <code>main.cc:67</code>에 주석 처리되어 있다.</p>
         </div>
-        <div class="ev">
-          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.cc</b><span>:142, :152 · 대응하는 free 없음</span></div>
-          <pre><span class="cm">// :142  후보 윈도마다 한 번씩</span>
+        <div class="ev" data-linked="1"><div class="ev-head"><a class="src" href="https://github.com/jiunbae/MAT4015/blob/HEAD/imageProcessing/imageProcessing/cv_tracker.cc#L142" target="_blank" rel="noopener"><b>imageProcessing/imageProcessing/cv_tracker.cc</b></a><span>:142, :152 · 대응하는 free 없음</span><button class="expand" type="button" data-repo="MAT4015" data-path="imageProcessing/imageProcessing/cv_tracker.cc" data-start="142" data-end="142">전체 맥락</button></div><pre><span class="cm">// :142  후보 윈도마다 한 번씩</span>
 	double * nHists = myHistogram(img, rc);
 <span class="cm">// :152  매번 새 할당, NULL 검사도 없음</span>
-	double * hists = <span class="hl">(double*)calloc(param.hist_bins, sizeof(double))</span>, hist_size = 256 / param.hist_bins;</pre>
-        </div>
+	double * hists = <span class="hl">(double*)calloc(param.hist_bins, sizeof(double))</span>, hist_size = 256 / param.hist_bins;</pre></div>
         <div class="prose">
           <p>프레임당 호출 횟수는 탐색 격자(<code>:49–63</code>, 약 50–80회) × 반복 횟수(측정값 3–6회)에 크기 탐색(<code>:76–85</code>, 약 25회)과 <code>:99</code>의 모델 갱신을 더한 값이다. 시뮬레이션에서 관측된 반복 수 기준으로 프레임당 200–500회, 회당 128바이트이면 프레임당 25–60KB가 새고 재생 시간에 비례해 선형으로 증가한다. 240프레임짜리 데모 하나가 수 MB 규모다.</p>
           <p><code>initilize</code>의 <code>this-&gt;objectHists</code>(<code>:23</code>)도 소멸자 <code>Tracker::~Tracker(void) {}</code>(<code>:8</code>)가 비어 있어 해제되지 않는다.</p>
         </div>
       </article>
 
-      <article class="finding" data-sev="minor">
-        <header><span class="tier">경미</span><h3>탐색창 클램프에서 rows와 cols가 뒤바뀌어 있다</h3></header>
+      <article class="finding" id="f05" data-sev="minor">
+        <header><span class="tier">경미</span><h3>탐색창 클램프에서 rows와 cols가 뒤바뀌어 있다</h3><a class="permalink" href="#f05" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p>폭을 <code>hsv.rows</code>(세로 픽셀 수)로, 높이를 <code>hsv.cols</code>(가로 픽셀 수)로 자른다. 가로 영상에 작은 박스라면 클램프가 애초에 걸리지 않아 드러나지 않지만, 세로 영상이나 큰 ROI에서는 틀린 경계가 된다. 같은 실수가 <code>example/open.c:97</code>, <code>:110</code>에도 있다.</p>
         </div>
-        <div class="ev">
-          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.cc</b><span>:46–47</span></div>
-          <pre>			temp = Rect(max(nRect.x - (int)param.search_range, 0), max(nRect.y - (int)param.search_range, 0),
-				min(nRect.width + (int)param.search_range * 2, <span class="hl">hsv.rows</span>), min(nRect.height + (int)param.search_range * 2, <span class="hl">hsv.cols</span>));</pre>
-        </div>
+        <div class="ev" data-linked="1"><div class="ev-head"><a class="src" href="https://github.com/jiunbae/MAT4015/blob/HEAD/imageProcessing/imageProcessing/cv_tracker.cc#L46-L47" target="_blank" rel="noopener"><b>imageProcessing/imageProcessing/cv_tracker.cc</b></a><span>:46–47</span><button class="expand" type="button" data-repo="MAT4015" data-path="imageProcessing/imageProcessing/cv_tracker.cc" data-start="46" data-end="47">전체 맥락</button></div><pre>			temp = Rect(max(nRect.x - (int)param.search_range, 0), max(nRect.y - (int)param.search_range, 0),
+				min(nRect.width + (int)param.search_range * 2, <span class="hl">hsv.rows</span>), min(nRect.height + (int)param.search_range * 2, <span class="hl">hsv.cols</span>));</pre></div>
       </article>
 
-      <article class="finding" data-sev="minor">
-        <header><span class="tier">경미</span><h3>역투영 인덱싱이 <code>hist_bins == 16</code>에서만 우연히 맞는다</h3></header>
+      <article class="finding" id="f06" data-sev="minor">
+        <header><span class="tier">경미</span><h3>역투영 인덱싱이 <code>hist_bins == 16</code>에서만 우연히 맞는다</h3><a class="permalink" href="#f06" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p><code>myHistogram</code>은 <code>256 / hist_bins</code>로 나눠 bin을 정하는데(<code>:152, :157</code>), <code>myHistogramValue</code>는 <code>hist_bins</code>로 나눈다(<code>:201</code>). 두 값이 같아지는 경우는 <code>hist_bins = 16</code>뿐이고, 기본값이 정확히 16이라 지금은 동작한다. 파라미터를 바꾸는 순간 배열 밖을 읽는다.</p>
         </div>
-        <div class="ev">
-          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.cc</b><span>:201 vs :152</span></div>
-          <pre><span class="cm">// :152  bin 폭 = 256 / hist_bins</span>
+        <div class="ev" data-linked="1"><div class="ev-head"><a class="src" href="https://github.com/jiunbae/MAT4015/blob/HEAD/imageProcessing/imageProcessing/cv_tracker.cc#L201" target="_blank" rel="noopener"><b>imageProcessing/imageProcessing/cv_tracker.cc</b></a><span>:201 vs :152</span><button class="expand" type="button" data-repo="MAT4015" data-path="imageProcessing/imageProcessing/cv_tracker.cc" data-start="201" data-end="201">전체 맥락</button></div><pre><span class="cm">// :152  bin 폭 = 256 / hist_bins</span>
 double * hists = ..., <span class="hl">hist_size = 256 / param.hist_bins</span>;
 <span class="cm">// :201  나누는 수가 다르다</span>
-return hists[matrixAt(img, x, y) / <span class="hl">param.hist_bins</span>];</pre>
-        </div>
+return hists[matrixAt(img, x, y) / <span class="hl">param.hist_bins</span>];</pre></div>
         <pre class="code"><span class="cm">// 인덱스 상한 계산 결과</span>
 hist_bins= 8: myHistogram 최대 idx=  7 (배열 크기 8) | myHistogramValue 최대 idx= 31  → OUT OF BOUNDS
 hist_bins=16: myHistogram 최대 idx= 15 (배열 크기 16)| myHistogramValue 최대 idx= 15  → ok
@@ -340,8 +428,8 @@ hist_bins=32: myHistogram 최대 idx= 31 (배열 크기 32)| myHistogramValue �
         </div>
       </article>
 
-      <article class="finding" data-sev="minor">
-        <header><span class="tier">경미</span><h3>모델 히스토그램 갱신 가드가 항상 열려 있다</h3></header>
+      <article class="finding" id="f07" data-sev="minor">
+        <header><span class="tier">경미</span><h3>모델 히스토그램 갱신 가드가 항상 열려 있다</h3><a class="permalink" href="#f07" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p><code>:97</code>의 <code>if (param.search_range == SEARCH_MIN)</code>은 "충분히 수렴했을 때만 모델을 갱신한다"는 의도의 가드다. 그런데 앞서 본 대로 <code>:69</code>의 계수가 1을 넘지 못해 탐색 반경은 첫 프레임에 하한 4.0에 도달한 뒤 계속 그 값이다(시뮬레이션 확인). 결과적으로 조건은 <strong>매 프레임 참</strong>이 되고, 모델은 현재 박스가 덮은 영역으로 무조건 0.05씩 끌려간다. 추적이 빗나가도 이를 막을 유사도 임계값은 없다. 전형적인 model drift 구조다.</p>
         </div>
@@ -360,22 +448,17 @@ hist_bins=32: myHistogram 최대 idx= 31 (배열 크기 32)| myHistogramValue �
     <p class="prose">브리프의 질문 — "OpenCV의 <code>meanShift</code>/<code>CamShift</code>를 그냥 호출했는가" — 에 대한 답은 "호출했지만, 그것은 자작 구현의 <em>비교 대상</em>으로 세운 것"이다. 문제는 그 비교 대상이 작동하지 않는다는 데 있다.</p>
     <div class="stack-lg">
 
-      <article class="finding" data-sev="critical">
-        <header><span class="tier">치명적</span><h3><code>Rect</code>를 값으로 넘겨 OpenCV 추적 결과가 버려진다</h3></header>
+      <article class="finding" id="f08" data-sev="critical">
+        <header><span class="tier">치명적</span><h3><code>Rect</code>를 값으로 넘겨 OpenCV 추적 결과가 버려진다</h3><a class="permalink" href="#f08" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p>OpenCV의 <code>meanShift(InputArray, Rect&amp; window, TermCriteria)</code>는 두 번째 인자를 <strong>참조로 받아 갱신</strong>하는 것이 전부인 API다. 그런데 <code>Tracker::cvMeanShift</code>는 <code>Rect</code>를 값으로 선언했다. 갱신은 지역 복사본에서 끝나고 호출자의 <code>cvRect</code>는 <code>initilize</code>(<code>:28</code>)에서 설정된 최초 ROI에 영원히 고정된다.</p>
           <p>즉 베이스라인은 매 프레임 같은 자리에서 다시 출발해 근처 모드로 수렴할 뿐, 상태를 이어받지 않는다. 추적이 아니라 매 프레임 독립 재검출이고, 목표가 최초 박스를 벗어나면 따라가지 못한다.</p>
         </div>
-        <div class="ev">
-          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.h</b><span>:95–97 · 선언부터 값 전달</span></div>
-          <pre>		<span class="cm">// cv::meanshift</span>
+        <div class="ev" data-linked="1"><div class="ev-head"><a class="src" href="https://github.com/jiunbae/MAT4015/blob/HEAD/imageProcessing/imageProcessing/cv_tracker.h#L95-L97" target="_blank" rel="noopener"><b>imageProcessing/imageProcessing/cv_tracker.h</b></a><span>:95–97 · 선언부터 값 전달</span><button class="expand" type="button" data-repo="MAT4015" data-path="imageProcessing/imageProcessing/cv_tracker.h" data-start="95" data-end="97">전체 맥락</button></div><pre>		<span class="cm">// cv::meanshift</span>
 		void cvMeanShift(Mat&amp;, const Mat&amp;, <span class="hl">Rect</span>);
 		<span class="cm">// cv::camshift</span>
-		void cvCamShift(Mat&amp;, const Mat&amp;, <span class="hl">Rect</span>);</pre>
-        </div>
-        <div class="ev">
-          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.cc</b><span>:128, :329–332</span></div>
-          <pre><span class="cm">// :128  멤버 cvRect를 넘기지만 복사본이 만들어진다</span>
+		void cvCamShift(Mat&amp;, const Mat&amp;, <span class="hl">Rect</span>);</pre></div>
+        <div class="ev" data-linked="1"><div class="ev-head"><a class="src" href="https://github.com/jiunbae/MAT4015/blob/HEAD/imageProcessing/imageProcessing/cv_tracker.cc#L128" target="_blank" rel="noopener"><b>imageProcessing/imageProcessing/cv_tracker.cc</b></a><span>:128, :329–332</span><button class="expand" type="button" data-repo="MAT4015" data-path="imageProcessing/imageProcessing/cv_tracker.cc" data-start="128" data-end="128">전체 맥락</button></div><pre><span class="cm">// :128  멤버 cvRect를 넘기지만 복사본이 만들어진다</span>
 			cvMeanShift(img, backproj, <span class="hl">cvRect</span>);
 
 <span class="cm">// :329  rc는 지역 복사본. meanShift가 갱신해도 호출자에게 돌아가지 않는다</span>
@@ -383,61 +466,54 @@ void Tracker::cvMeanShift(Mat&amp; img, const Mat&amp; backproj, <span class="hl
 {
 	meanShift(backproj, rc, TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, param.max_itrs, 1));
 	rectangle(img, rc, Scalar(0, 0, 255), 3, CV_AA);
-}</pre>
-        </div>
+}</pre></div>
         <div class="prose">
           <p>이 결함은 레포에 커밋된 증거로 직접 확인된다. <code>README.md:12</code>가 자랑스럽게 링크한 <code>TESTED/tested.gif</code>(726×442, 240프레임)에서 40번째와 90번째 프레임을 뽑아 보면, 초록 박스(<code>:116</code>, 자작)는 대상 물체를 따라 화면 중앙을 가로질러 이동하는데 <strong>빨간 박스(<code>:332</code>, OpenCV)는 왼쪽 하단 같은 자리에 머문 채 미세하게 떨기만 한다.</strong> 저자가 성공 데모라고 올린 파일이 베이스라인이 죽어 있다는 증거가 되어 있다.</p>
         </div>
       </article>
 
-      <article class="finding" data-sev="major">
-        <header><span class="tier">중대</span><h3>유일한 추적 실패 복구 로직이 도달 불가능한 데다, 도달해도 무효다</h3></header>
+      <article class="finding" id="f09" data-sev="major">
+        <header><span class="tier">중대</span><h3>유일한 추적 실패 복구 로직이 도달 불가능한 데다, 도달해도 무효다</h3><a class="permalink" href="#f09" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p>프로젝트 전체에서 "대상을 잃었을 때"를 처리하는 코드는 <code>cvCamShift</code> 끝의 <code>:343–347</code>뿐이다. 박스가 1픽셀 이하로 쪼그라들면 탐색창을 다시 넓히는, 전형적인 CamShift 복구 패턴이다. 그런데 두 겹으로 죽어 있다.</p>
           <p>첫째, 이 분기에 들어갈 방법이 없다. <code>cvMeanshift</code>는 <code>cv_tracker.h:82</code>에서 <code>true</code>로 하드코딩된 <code>protected</code> 멤버이고 setter도, 이를 바꾸는 UI도, 명령행 옵션도 없다. <code>:126</code>의 분기는 항상 <code>meanShift</code> 쪽으로만 간다. 둘째, 설령 들어가도 <code>rc</code>가 값 복사본이라 재조정 결과가 함수 밖으로 나가지 못한다.</p>
         </div>
-        <div class="ev">
-          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.h</b><span>:81–82 · 및 cv_tracker.cc:343–347</span></div>
-          <pre>		<span class="cm">// if off, openCV method apply camshift;</span>
+        <div class="ev" data-linked="1"><div class="ev-head"><a class="src" href="https://github.com/jiunbae/MAT4015/blob/HEAD/imageProcessing/imageProcessing/cv_tracker.h#L81-L82" target="_blank" rel="noopener"><b>imageProcessing/imageProcessing/cv_tracker.h</b></a><span>:81–82 · 및 cv_tracker.cc:343–347</span><button class="expand" type="button" data-repo="MAT4015" data-path="imageProcessing/imageProcessing/cv_tracker.h" data-start="81" data-end="82">전체 맥락</button></div><pre>		<span class="cm">// if off, openCV method apply camshift;</span>
 		bool cvMeanshift = <span class="hl">true</span>;   <span class="cm">// ← setter 없음. 아래 전부 도달 불가</span>
 
 	if (rc.width &lt;= 1 || rc.height &lt;= 1)
 	{
 		int cols = backproj.cols, rows = backproj.rows, r = (MIN(cols, rows) + 5) / 6;
 		<span class="hl">rc</span> = Rect(rc.x - r, rc.y - r, rc.width + 2 * r, rc.height + 2 * r) &amp; Rect(0, 0, cols, rows);
-	}</pre>
-        </div>
+	}</pre></div>
         <div class="prose">
           <p>자작 경로에도 실패 감지가 없다. <code>mySimilarity</code>의 최대값을 무조건 받아들일 뿐, "이 정도로 안 닮았으면 놓친 것"이라는 임계값이 없다. 앞서 본 무조건 모델 갱신과 합쳐지면 한 번 빗나갔을 때 되돌아올 경로가 존재하지 않는다.</p>
         </div>
       </article>
 
-      <article class="finding" data-sev="major">
-        <header><span class="tier">중대</span><h3>역방향 드래그가 ROI 가드를 통과해 예외로 죽는다</h3></header>
+      <article class="finding" id="f10" data-sev="major">
+        <header><span class="tier">중대</span><h3>역방향 드래그가 ROI 가드를 통과해 예외로 죽는다</h3><a class="permalink" href="#f10" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p>ROI는 <code>x - sPoint.x</code>, <code>y - sPoint.y</code>로 만들어지므로 오른쪽 아래→왼쪽 위로 끌면 width와 height가 <strong>둘 다 음수</strong>가 된다. 그리고 유효성 검사가 <code>rect.area() &gt; 100</code>이다. 음수 × 음수는 양수이므로 (200,200)→(100,100) 드래그는 넓이 10000으로 가드를 통과한다.</p>
           <p>그대로 <code>tracker.initilize</code>로 들어가면 <code>cv_tracker.cc:264</code>의 <code>Mat target(hsv, rc);</code>가 음수 크기 ROI에 대해 <code>cv::Exception</code>을 던진다. <code>try/catch</code>가 없으므로 프로그램이 종료된다. 사용자가 박스를 반대 방향으로 그렸다는 것이 유일한 조건이다.</p>
         </div>
-        <div class="ev">
-          <div class="ev-head"><b>imageProcessing/imageProcessing/main.cc</b><span>:94–98</span></div>
-          <pre>				p-&gt;rect = { p-&gt;sPoint.x, p-&gt;sPoint.y, <span class="hl">x - p-&gt;sPoint.x</span>, <span class="hl">y - p-&gt;sPoint.y</span> };
+        <div class="ev" data-linked="1"><div class="ev-head"><a class="src" href="https://github.com/jiunbae/MAT4015/blob/HEAD/imageProcessing/imageProcessing/main.cc#L94-L98" target="_blank" rel="noopener"><b>imageProcessing/imageProcessing/main.cc</b></a><span>:94–98</span><button class="expand" type="button" data-repo="MAT4015" data-path="imageProcessing/imageProcessing/main.cc" data-start="94" data-end="98">전체 맥락</button></div><pre>				p-&gt;rect = { p-&gt;sPoint.x, p-&gt;sPoint.y, <span class="hl">x - p-&gt;sPoint.x</span>, <span class="hl">y - p-&gt;sPoint.y</span> };
 				p-&gt;drag = false;
 				
 				if (<span class="hl">p-&gt;rect.area() &gt; 100</span>)   <span class="cm">// ← (-100)*(-100) = 10000 &gt; 100. 통과한다</span>
-					p-&gt;updated = true;</pre>
-        </div>
+					p-&gt;updated = true;</pre></div>
       </article>
 
-      <article class="finding" data-sev="minor">
-        <header><span class="tier">경미</span><h3>컬러 모델 메뉴가 자작 추적기에는 아무 영향이 없다</h3></header>
+      <article class="finding" id="f11" data-sev="minor">
+        <header><span class="tier">경미</span><h3>컬러 모델 메뉴가 자작 추적기에는 아무 영향이 없다</h3><a class="permalink" href="#f11" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p><code>main.cc:60</code>이 HSV / RGB / hue / gray 네 가지를 물어보지만, 자작 경로는 <code>initilize</code>(<code>cv_tracker.cc:18</code>)와 <code>run</code>(<code>:39</code>) 모두 무조건 <code>CV_BGR2HSV</code>로 변환하고, <code>matrixAt</code>(<code>:195</code>)은 <code>channel_ratio</code> <code>{0.5, 0.25, 0.25}</code>(<code>cv_tracker.h:48</code>)로 세 채널을 고정 비율 합산한다. 선택은 OpenCV 경로의 <code>switch</code>에만 닿는다. 사용자에게 네 개의 선택지를 주면서 실제로는 하나만 구현된 셈이다.</p>
           <p>입력 검증도 없다. <code>cin &gt;&gt; model</code> 뒤 <code>static_cast&lt;COLOR_MODEL&gt;(model - 1)</code>(<code>:65</code>)에 5를 넣으면 범위 밖 enum이 되어 <code>cvHistogram</code>의 <code>switch</code>가 아무 <code>case</code>도 타지 않고, <code>model3d</code>가 빈 채로 <code>calcBackProject</code>에 들어간다. 숫자가 아닌 입력이면 <code>model</code>이 0이 되어 <code>-1</code>이 된다.</p>
         </div>
       </article>
 
-      <article class="finding" data-sev="minor">
-        <header><span class="tier">경미</span><h3>첫 프레임 검사 누락과 의도적으로 주석 처리된 <code>delete</code></h3></header>
+      <article class="finding" id="f12" data-sev="minor">
+        <header><span class="tier">경미</span><h3>첫 프레임 검사 누락과 의도적으로 주석 처리된 <code>delete</code></h3><a class="permalink" href="#f12" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p><code>main.cc:120</code>의 <code>*vc &gt;&gt; frame;</code> 직후 <code>imshow</code>를 호출하는데 <code>frame.empty()</code> 검사가 없다. 파일은 열리지만 첫 프레임 디코딩에 실패하는 경우(코덱 불일치 등) 그대로 예외다. 루프 안의 두 번째 읽기에는 <code>:139</code>에 검사가 있으므로 영상 종료 처리 자체는 되어 있다.</p>
           <p><code>new VideoCapture</code>(<code>:50</code>)에 대응하는 <code>delete</code>는 <code>:66–67</code>에 주석으로 남아 있다. 프로세스 종료로 회수되긴 하지만, 지웠다가 문제가 생겨 되돌린 흔적으로 읽힌다. <code>cv_tracker.cc:94</code>의 <code>bRect = myRect = nRect;</code>에서 <code>bRect</code>로의 대입도 지역 변수의 마지막 쓰기라 죽은 코드다.</p>
@@ -453,32 +529,29 @@ void Tracker::cvMeanShift(Mat&amp; img, const Mat&amp; backproj, <span class="hl
     <p class="prose"><code>docs/object_tracking.pptx</code> 18장을 텍스트 추출해 전부 읽었다. 발표자는 "배지운 이영수" 두 명으로 적혀 있고, 목차는 1. Set target object → 2. Back projection → 3. Mean shift process → 4. Updating → 5. Other functions → References로 이어진다. 구조 자체는 성실하고, 마지막 장이 "한양대학교 확률및통계 강의자료"를 출처로 밝힌 점도 정직하다.</p>
     <div class="stack-lg">
 
-      <article class="finding" data-sev="major">
-        <header><span class="tier">중대</span><h3>13장의 "픽셀을 역투영 가중치로 mean shift 클러스터링"은 구현되지 않았다</h3></header>
+      <article class="finding" id="f13" data-sev="major">
+        <header><span class="tier">중대</span><h3>13장의 "픽셀을 역투영 가중치로 mean shift 클러스터링"은 구현되지 않았다</h3><a class="permalink" href="#f13" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p>슬라이드 13의 문구는 <em>"Mean shift clustering of pixels with back projected weights"</em>다. 이것이 강의자료가 가르치는 정석이다 — 각 <strong>픽셀</strong>에 역투영 값을 가중치로 주고, 그 가중치로 중심을 옮긴다.</p>
           <p>실제 <code>cv_tracker.cc:49–63</code>은 다르다. 성긴 격자 위의 <strong>후보 윈도</strong>들을 순회하며, 각 윈도 <em>전체</em>의 히스토그램을 새로 계산해 모델과의 유사도를 구하고, 그 값을 가중치로 윈도 좌표들의 가중평균을 낸다. 픽셀 단위 가중이 아니라 윈도 단위 가중이고, 커널 가중 밀도의 모드를 오르는 것이 아니라 샘플링된 후보 집합의 가중 중심을 구하는 것이다. 동작은 비슷해 보일 수 있으나 mean shift의 수렴 보장(밀도 상승 방향으로의 이동)이 성립하는 구조가 아니다.</p>
           <p><code>:106–112</code>에 진짜 픽셀 단위 역투영이 있기는 하다. 다만 그것은 <code>MY_histogram</code> 창에 <strong>보여주기만</strong> 할 뿐, 위치 갱신에 쓰이지 않는다.</p>
         </div>
-        <div class="ev">
-          <div class="ev-head"><b>imageProcessing/imageProcessing/cv_tracker.cc</b><span>:52–55 · 픽셀이 아니라 윈도에 가중치를 준다</span></div>
-          <pre>					w = <span class="hl">mySimilarity</span>(hsv, Rect(temp.x + (temp.width / 2) + i, temp.y + (temp.height / 2) + j, nRect.width, nRect.height), this-&gt;objectHists);
+        <div class="ev" data-linked="1"><div class="ev-head"><a class="src" href="https://github.com/jiunbae/MAT4015/blob/HEAD/imageProcessing/imageProcessing/cv_tracker.cc#L52-L55" target="_blank" rel="noopener"><b>imageProcessing/imageProcessing/cv_tracker.cc</b></a><span>:52–55 · 픽셀이 아니라 윈도에 가중치를 준다</span><button class="expand" type="button" data-repo="MAT4015" data-path="imageProcessing/imageProcessing/cv_tracker.cc" data-start="52" data-end="55">전체 맥락</button></div><pre>					w = <span class="hl">mySimilarity</span>(hsv, Rect(temp.x + (temp.width / 2) + i, temp.y + (temp.height / 2) + j, nRect.width, nRect.height), this-&gt;objectHists);
 					tW += w;
 					nX += w * (temp.x + (temp.width / 2) + i);
-					nY += w * (temp.y + (temp.height / 2) + j);</pre>
-        </div>
+					nY += w * (temp.y + (temp.height / 2) + j);</pre></div>
       </article>
 
-      <article class="finding" data-sev="minor">
-        <header><span class="tier">경미</span><h3>OpenCV 예제 헤더를 커밋해 두고 파생 클래스에는 본인만 표기했다</h3></header>
+      <article class="finding" id="f14" data-sev="minor">
+        <header><span class="tier">경미</span><h3>OpenCV 예제 헤더를 커밋해 두고 파생 클래스에는 본인만 표기했다</h3><a class="permalink" href="#f14" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p><code>example/tracker_opencv/code/tracker_opencv.h</code>는 <em>"Written by darkpgmr (http://darkpgmr.tistory.com), 2013"</em>이라고 명시된 제3자 코드다. 그리고 <code>cv_tracker.h</code>의 OpenCV 경로 설계는 이 헤더와 상당히 겹친다 — <code>init</code>/<code>run</code> 형태의 공개 API, <code>hist_bins</code>·<code>max_itrs</code>·<code>color_model</code>을 담은 파라미터 구조체, <code>CM_GRAY</code>/<code>CM_HUE</code>/<code>CM_RGB</code>/<code>CM_HSV</code> enum, <code>m_model</code>/<code>m_model3d</code>에 대응하는 <code>model</code>/<code>model3d</code> 보호 멤버까지.</p>
           <p>참고 자료를 레포에 함께 남긴 것 자체는 오히려 투명한 행동이다. 다만 <code>cv_tracker.h:3–8</code>과 <code>main.cc:1–6</code>의 파일 헤더는 저자 본인의 GitHub 주소만 적고 있고, 발표자료 References 장에도 OpenCV 공식 문서와 강의자료만 있을 뿐 이 출처는 없다. 파생한 쪽에 한 줄 표기를 남기는 것이 맞다.</p>
         </div>
       </article>
 
-      <article class="finding" data-sev="minor">
-        <header><span class="tier">경미</span><h3>최상위 README가 구현에 대해 사실상 아무것도 말하지 않는다</h3></header>
+      <article class="finding" id="f15" data-sev="minor">
+        <header><span class="tier">경미</span><h3>최상위 README가 구현에 대해 사실상 아무것도 말하지 않는다</h3><a class="permalink" href="#f15" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p><code>README.md</code>는 13줄이고 그중 실질 내용은 <em>"using OpenCV to test image processing[object tracking]"</em> 한 줄과 데모 GIF 링크뿐이다. 빌드 방법, OpenCV 버전, 필요한 Visual Studio 구성, 조작법(마우스로 ROI를 끌고 ESC로 종료), 알고리즘 요약이 전부 없다. 정작 그 정보의 일부는 소스 파일 상단 주석(<code>cv_tracker.h:10–18</code>)에만 들어 있다. 문서가 코드보다 앞서가지 않는 대신, 아예 따라오지 않은 경우다.</p>
         </div>
@@ -496,8 +569,8 @@ void Tracker::cvMeanShift(Mat&amp; img, const Mat&amp; backproj, <span class="hl
     <h2>D — 레포 위생과 이식성</h2>
     <div class="stack-lg">
 
-      <article class="finding" data-sev="critical">
-        <header><span class="tier">치명적</span><h3>646줄짜리 과제를 위해 699MB를 커밋했다</h3></header>
+      <article class="finding" id="f16" data-sev="critical">
+        <header><span class="tier">치명적</span><h3>646줄짜리 과제를 위해 699MB를 커밋했다</h3><a class="permalink" href="#f16" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p>작업 트리 699MB, <code>.git</code> 160MB다. 원인은 <code>TESTED/</code>의 미디어가 아니다 — 그쪽은 mp4 두 개 약 11MB와 gif 4MB로 전체의 2%에 불과하다. 압도적인 주범은 <strong>OpenCV 3.0 SDK 전체를 x86/x64 × vc11/vc12 네 조합으로 통째 커밋한 것</strong>이다.</p>
         </div>
@@ -511,29 +584,26 @@ void Tracker::cvMeanShift(Mat&amp; img, const Mat&amp; backproj, <span class="hl
    ... opencv_world300*.dll 8개 합계 약 310MB, opencv_ts300*.lib 8개 합계 약 99MB
  7,383,466  imageProcessing/Debug/test.jpg   <span class="cm">// f93ca0a에서 커밋, 15b985e에서 삭제 — 히스토리에는 영구히 남음</span></pre>
         <div class="prose">
-          <p>덧붙일 점 셋. 첫째, 실제로 빌드에 쓰인 구성은 <code>Debug|Win32</code> 하나(<code>imageProcessing.vcxproj:92,97</code>, <code>opencv_world300d.lib</code>)이므로 나머지 세 조합의 라이브러리는 한 번도 쓰이지 않았다. 둘째, <code>example/.gitignore</code>가 <code>VTD_data_videos/</code>, <code>tracker_opencv/</code> 등을 나열하고 있지만 그 파일들은 이미 커밋된 뒤라(<code>901de66</code>, <code>295122a</code>) 아무 효과가 없다. 셋째, 당시 Visual Studio 프로젝트에서 SDK를 동봉하는 것이 드문 관행은 아니었으나, 그렇다고 60MB짜리 샘플 영상 <code>animal.avi</code>까지 함께 넣을 이유는 없었다.</p>
+          <p>덧붙일 점 셋. 첫째, 실제로 빌드에 쓰인 구성은 <code>Debug|Win32</code> 하나(<code>imageProcessing.vcxproj:92,97</code>, <code>opencv_world300d.lib</code>)이므로 나머지 세 조합의 라이브러리는 한 번도 쓰이지 않았다. 둘째, <code>example/.gitignore</code>가 <code>VTD_data_videos/</code>, <code>tracker_opencv/</code> 등을 나열하지만 그 파일들은 이미 커밋된 뒤라(<code>901de66</code>, <code>295122a</code>) 아무 효과가 없다. 셋째, 당시 Visual Studio 프로젝트에서 SDK를 동봉하는 것이 드문 관행은 아니었으나, 그렇다고 60MB짜리 샘플 영상 <code>animal.avi</code>까지 함께 넣을 이유는 없었다.</p>
         </div>
       </article>
 
-      <article class="finding" data-sev="major">
-        <header><span class="tier">중대</span><h3>제3자 바이너리를 재배포하면서 라이선스 표기가 없다</h3></header>
+      <article class="finding" id="f17" data-sev="major">
+        <header><span class="tier">중대</span><h3>제3자 바이너리를 재배포하면서 라이선스 표기가 없다</h3><a class="permalink" href="#f17" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p><code>find</code>로 확인한 결과 레포 전체에 <code>LICENSE</code>, <code>COPYING</code>, <code>NOTICE</code> 류 파일이 <strong>하나도 없다.</strong> OpenCV는 3-clause BSD이고, 그 조항은 바이너리 형태로 재배포할 때 저작권 고지와 조건문을 동봉할 것을 요구한다. 지금 레포에서 BSD 전문이 존재하는 곳은 벤더링된 헤더 파일 내부 주석뿐이며(<code>include/opencv/cv.h</code> 등), <code>lib/</code> 아래 DLL·LIB 8쌍에 대응하는 고지는 없다. 저자 자신의 코드에 대한 라이선스도 명시되지 않아 재사용 조건이 불분명하다.</p>
         </div>
       </article>
 
-      <article class="finding" data-sev="minor">
-        <header><span class="tier">경미</span><h3>Windows 전용 구속과 빌드조차 되지 않는 x64 구성</h3></header>
+      <article class="finding" id="f18" data-sev="minor">
+        <header><span class="tier">경미</span><h3>Windows 전용 구속과 빌드조차 되지 않는 x64 구성</h3><a class="permalink" href="#f18" aria-label="이 소견으로 가는 링크">#</a></header>
         <div class="prose">
           <p>macOS에서는 빌드가 불가능하며 그 사실은 명확히 기록해 둔다 — <code>main.cc:20</code>이 <code>&lt;Windows.h&gt;</code>를 포함하고, 파일 선택 대화상자가 <code>OPENFILENAME</code>과 <code>::GetOpenFileName</code>(<code>main.cc:165–180</code>)으로 구현되어 있으며, <code>cv_tracker.h:23–26</code>의 include 경로가 역슬래시(<code>"opencv2\core\core.hpp"</code>)다. C++ 표준에서 역슬래시가 든 헤더명은 구현 정의 동작이고 POSIX 툴체인에서는 그대로 깨진다. 프로젝트도 <code>PlatformToolset v140</code>, <code>WindowsTargetPlatformVersion 8.1</code>에 묶여 있다. 따라서 아래 모든 판정은 빌드가 아니라 정독과 산술 포팅 시뮬레이션에 근거한다.</p>
           <p>그와 별개로 <code>Debug|x64</code> 구성은 Windows에서도 빌드되지 않았을 것이다. include 경로가 드라이브 루트 기준 <code>\include</code>이고 라이브러리 경로가 <code>\lib\x86\vc12\lib</code>, 즉 x64 구성이 <strong>x86 라이브러리</strong>를 루트 절대경로로 가리킨다. 다른 세 구성이 쓰는 프로젝트 상대경로 <code>.\include</code>와 대조된다.</p>
         </div>
-        <div class="ev">
-          <div class="ev-head"><b>imageProcessing/imageProcessing/imageProcessing.vcxproj</b><span>:101, 109, 114</span></div>
-          <pre>  &lt;ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='<span class="hl">Debug|x64</span>'"&gt;
+        <div class="ev" data-linked="1"><div class="ev-head"><a class="src" href="https://github.com/jiunbae/MAT4015/blob/HEAD/imageProcessing/imageProcessing/imageProcessing.vcxproj#L101" target="_blank" rel="noopener"><b>imageProcessing/imageProcessing/imageProcessing.vcxproj</b></a><span>:101, 109, 114</span><button class="expand" type="button" data-repo="MAT4015" data-path="imageProcessing/imageProcessing/imageProcessing.vcxproj" data-start="101" data-end="101">전체 맥락</button></div><pre>  &lt;ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='<span class="hl">Debug|x64</span>'"&gt;
       &lt;AdditionalIncludeDirectories&gt;<span class="hl">\include</span>;%(AdditionalIncludeDirectories)&lt;/AdditionalIncludeDirectories&gt;
-      &lt;AdditionalLibraryDirectories&gt;<span class="hl">\lib\x86\vc12\lib</span>;%(AdditionalLibraryDirectories)&lt;/AdditionalLibraryDirectories&gt;</pre>
-        </div>
+      &lt;AdditionalLibraryDirectories&gt;<span class="hl">\lib\x86\vc12\lib</span>;%(AdditionalLibraryDirectories)&lt;/AdditionalLibraryDirectories&gt;</pre></div>
       </article>
 
     </div>
@@ -568,6 +638,112 @@ void Tracker::cvMeanShift(Mat&amp; img, const Mat&amp; backproj, <span class="hl
   <footer>
     <p>평가 대상: <code>github.com/jiunbae/MAT4015</code> · 커밋 32개(2016-04-10 ~ 2016-06-23, 이후 2021-08-09 GitHub 계정명 변경 커밋 1건) · 브랜치는 <code>master</code> 단일 · 저자 코드 646줄(<code>cv_tracker.cc</code> 348 + <code>main.cc</code> 180 + <code>cv_tracker.h</code> 118), 별도로 <code>example/open.c</code> 355줄</p>
     <p>검증 방식: <strong>빌드하지 않았다.</strong> Visual Studio 솔루션에 <code>&lt;Windows.h&gt;</code>·<code>GetOpenFileName</code>·역슬래시 include 경로 의존이 있어 macOS에서 컴파일이 불가능하다. 대신 (1) 저자 코드 646줄과 <code>example/open.c</code> 355줄 전체 정독, (2) <code>cv_tracker.cc:42–91</code>의 산술을 Python으로 그대로 포팅해 합성 프레임에서 20프레임 실행 — 보고서의 좌표 어긋남·정지 화면 드리프트·<code>search_range</code> 하한 고착 수치는 모두 그 실행 결과, (3) 인덱스 상한 계산으로 <code>hist_bins≠16</code>에서의 배열 밖 접근 확인, (4) <code>docs/object_tracking.pptx</code> 18장 및 두 강의자료 PDF(46쪽·39쪽) 텍스트 추출, (5) <code>TESTED/tested.gif</code> 240프레임 중 40·90번 프레임을 <code>ffmpeg</code>으로 추출해 육안 확인 — 빨간 박스 고착의 근거, (6) <code>git rev-list --objects</code>로 전체 blob 크기 집계. 모든 인용은 실제 파일과 행 번호를 <code>grep -n</code>으로 대조했다.</p>
+  
+  <details class="prompt">
+    <summary>이 보고서를 만든 프롬프트</summary>
+    <div class="prompt-body">
+      <p>저장소마다 리뷰어 한 명이 아래 지시로 독립 조사했다. 공통 지침은 <a href="https://cse.jiun.dev/method.html">방법론</a>에 전문이 있다.</p>
+      <pre class="code">확률·확률과정 과목인데 제출물은 OpenCV 객체 추적이다. 핵심 질문 둘: (1) 구현이 mean-shift의 확률적 근거(히스토그램 역투영, 커널 밀도 추정, 수렴 조건)를 이해하고 작성된 것인가, 아니면 OpenCV API 호출을 나열한 것인가. (2) 과목의 확률론적 내용이 코드/문서에 실제로 반영되어 있는가. Visual Studio 솔루션이라 macOS에서 빌드 불가이니 명시하고 정독으로 판단하되, 플랫폼 종속성은 이식성 항목으로 지적하라.</pre>
+    </div>
+  </details>
   </footer>
 
 </div>
+<script>
+(function(){
+  "use strict";
+  // ---- 1. expandable source from raw.githubusercontent ----
+  document.addEventListener("click", async function(e){
+    var b = e.target.closest(".expand"); if(!b) return;
+    var ev = b.closest(".ev"); var open = ev.querySelector(".ev-more");
+    if(open){ open.remove(); b.textContent="전체 맥락"; return; }
+    b.textContent="불러오는 중…"; b.disabled = true;
+    var repo=b.dataset.repo, path=b.dataset.path,
+        s=parseInt(b.dataset.start,10), t=parseInt(b.dataset.end,10)||s;
+    var box=document.createElement("div"); box.className="ev-more";
+    try{
+      var url="https://raw.githubusercontent.com/jiunbae/"+repo+"/HEAD/"+path
+              .split("/").map(encodeURIComponent).join("/");
+      var res=await fetch(url); if(!res.ok) throw new Error("HTTP "+res.status);
+      var lines=(await res.text()).split("\n");
+      var from=Math.max(1,s-15), to=Math.min(lines.length,t+15);
+      var pre=document.createElement("pre");
+      for(var i=from;i<=to;i++){
+        var row=document.createElement(i>=s&&i<=t?"mark":"span");
+        var n=document.createElement("span"); n.className="ln"; n.textContent=i;
+        row.appendChild(n); row.appendChild(document.createTextNode(lines[i-1]+"\n"));
+        pre.appendChild(row);
+      }
+      box.appendChild(pre);
+    }catch(err){
+      var d=document.createElement("div"); d.className="err";
+      d.textContent="원본을 불러오지 못했습니다 ("+err.message+"). 위 파일명을 눌러 GitHub에서 확인하세요.";
+      box.appendChild(d);
+    }
+    ev.appendChild(box); b.textContent="접기"; b.disabled=false;
+  });
+
+  // ---- 2. severity filter on report pages ----
+  var findings = document.querySelectorAll(".finding[data-sev]");
+  if(findings.length > 2){
+    var counts={critical:0,major:0,minor:0};
+    findings.forEach(function(f){ var k=f.dataset.sev; if(k in counts) counts[k]++; });
+    var host = document.querySelector("section");
+    if(host){
+      var bar=document.createElement("div"); bar.className="filters";
+      bar.innerHTML='<span class="lbl">심각도</span>';
+      [["all","전체",findings.length],["critical","치명적",counts.critical],
+       ["major","중대",counts.major],["minor","경미",counts.minor]].forEach(function(o){
+        if(o[0]!=="all" && !o[2]) return;
+        var btn=document.createElement("button");
+        btn.type="button"; btn.dataset.sev=o[0];
+        btn.setAttribute("aria-pressed", o[0]==="all");
+        btn.textContent=o[1]+" "+o[2];
+        bar.appendChild(btn);
+      });
+      host.parentNode.insertBefore(bar, host);
+      bar.addEventListener("click", function(e){
+        var b=e.target.closest("button"); if(!b) return;
+        bar.querySelectorAll("button").forEach(function(x){
+          x.setAttribute("aria-pressed", x===b); });
+        var want=b.dataset.sev;
+        findings.forEach(function(f){
+          f.hidden = (want!=="all" && f.dataset.sev!==want); });
+      });
+    }
+  }
+
+  // ---- 3. index: grade / year filter ----
+  var rows=document.querySelectorAll(".row");
+  if(rows.length>4 && document.querySelector(".yr")){
+    var grades=[...new Set([...rows].map(function(r){
+      var g=r.querySelector(".rg"); return g?g.textContent.trim():""; }))].filter(Boolean).sort();
+    var sec=document.querySelector(".yr").parentNode;
+    var bar=document.createElement("div"); bar.className="filters";
+    bar.innerHTML='<span class="lbl">등급</span>';
+    [["all","전체"]].concat(grades.map(function(g){return [g,g];})).forEach(function(o){
+      var b=document.createElement("button"); b.type="button"; b.dataset.g=o[0];
+      b.setAttribute("aria-pressed", o[0]==="all"); b.textContent=o[1];
+      bar.appendChild(b);
+    });
+    sec.insertBefore(bar, document.querySelector(".yr"));
+    bar.addEventListener("click", function(e){
+      var b=e.target.closest("button"); if(!b) return;
+      bar.querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed", x===b); });
+      var want=b.dataset.g;
+      rows.forEach(function(r){
+        var g=r.querySelector(".rg"); var m = want==="all" || (g && g.textContent.trim()===want);
+        r.style.display = m ? "" : "none";
+      });
+      document.querySelectorAll(".yr").forEach(function(y){
+        var n=0, el=y.nextElementSibling;
+        while(el && el.classList.contains("row")){ if(el.style.display!=="none") n++; el=el.nextElementSibling; }
+        y.style.display = n ? "" : "none";
+      });
+    });
+  }
+})();
+
+</script>
+</body>
+</html>
